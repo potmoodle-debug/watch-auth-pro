@@ -1,0 +1,11 @@
+BEFORE COMMITTING, GITHUB MUST SHOW:
+
+[ ] index.html
+[ ] styles.css
+[ ] app.js
+[ ] .nojekyll
+[ ] README.txt
+[ ] DEPLOYMENT_CHECKLIST.txt
+[ ] data/watch-reference-data.js
+
+Do not commit if watch-reference-data.js appears at the repository root.

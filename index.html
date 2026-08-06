@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <title>Watch Auth Pro v2.53.0 — Separated Reference Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="app-shell topbar-inner">
+            <div class="brand-lockup">
+                <div class="brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                        <circle cx="12" cy="12" r="6.4"></circle><path d="M9.2 2h5.6l.7 4H8.5l.7-4ZM9.2 22h5.6l.7-4H8.5l.7 4ZM12 8.8V12l2.3 1.5"></path>
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title">Watch Auth Pro</div>
+                    <div class="brand-subtitle">Internal inspection workspace</div>
+                    <div class="database-status" id="database-status">Database loading…</div>
+                </div>
+            </div>
+            <div class="status-cluster">
+                <div class="inspection-stat">
+                    <span>Completed</span><strong id="inspection-count">0</strong>
+                    <button onclick="triggerClearCounter()" class="icon-button" title="Reset counter and logs" aria-label="Reset counter and logs">↺</button>
+                </div>
+                <div class="confidence-block">
+                    <div class="confidence-row">
+                        <span class="text-[10px] uppercase tracking-[.14em] text-gray-500 font-bold">Inspection state</span>
+                        <div id="confidence-meter" class="text-xs font-bold uppercase tracking-widest text-gray-400">READY</div>
+                    </div>
+                    <div class="confidence-track"><div id="progress-bar" class="h-full bg-blue-600 w-0"></div></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-shell">
+        <nav class="workflow-nav" aria-label="Inspection workflow">
+            <div id="workflow-tabs">
+                <button id="tab-details-btn" onclick="switchTab('details')" class="text-blue-500"><span class="step-number">1</span><span class="tab-symbol" aria-hidden="true">◈</span>Verification details</button>
+                <button id="tab-checklist-btn" onclick="switchTab('checklist')"><span class="step-number">2</span><span class="tab-symbol" aria-hidden="true">☑</span>Component checklist</button>
+                <button id="tab-history-btn" onclick="switchTab('history')"><span class="step-number">3</span><span class="tab-symbol" aria-hidden="true">≡</span>Inspection logs <span id="history-badge" class="bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span></button>
+                <button id="tab-missing-btn" onclick="switchTab('missing')"><span class="step-number">4</span><span class="tab-symbol" aria-hidden="true">＋</span>Missing references <span id="missing-badge" class="bg-amber-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span></button>
+                <button id="tab-counterfeit-btn" onclick="switchTab('counterfeit')"><span class="step-number">5</span><span class="tab-symbol" aria-hidden="true">⚠</span>Counterfeit register <span id="counterfeit-badge" class="bg-red-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span></button>
+            </div>
+            <div class="workspace-mode-wrap">
+                <div class="workspace-mode-switch" role="group" aria-label="Workspace mode">
+                    <button type="button" id="simple-mode-btn" onclick="setDashboardMode('simple')">Simple</button>
+                    <button type="button" id="advanced-mode-btn" onclick="setDashboardMode('advanced')">Advanced</button>
+                </div>
+                <div id="workspace-mode-help" class="workspace-mode-help">Simple shows the essential inspection workflow.</div>
+            </div>
+        </nav>
+
+        <div id="work-area">
+            <main class="primary-column">
+                <div id="tab-details-content">
+                    <div class="simple-mode-banner">
+                        <strong class="text-white">Simple inspection</strong><br>
+                        Complete the core identification, movement, condition and comments fields. The application will interrupt only for significant mismatches, known-fake indicators or missing information.
+                    </div>
+                    <section class="panel panel-identification">
+                        <div class="panel-header">
+                            <div>
+                                <div class="panel-kicker">Step 1 · Identify</div>
+                                <div class="panel-title-line"><span class="panel-title-symbol" aria-hidden="true">⌚</span><h1 class="panel-title">Watch identification</h1></div>
+                                <p class="panel-description">Choose the brand, then capture the identifying references used for cross-checking and forensic analysis.</p>
+                            </div>
+                            <button id="reference-guide-btn" onclick="toggleDrawer()" class="guide-button advanced-only">Brand reference <span aria-hidden="true">→</span></button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="subsection-title section-title-blue"><span class="section-number">1</span><span class="section-symbol" aria-hidden="true">◆</span><span>Select brand</span></div>
+                            <div class="brand-selector-toolbar">
+                                <div class="brand-search-wrap">
+                                    <span class="brand-search-icon" aria-hidden="true">⌕</span>
+                                    <input id="brandSearch" type="search" placeholder="Search brands — e.g. Rolex, Omega, Cartier" oninput="filterBrandCards()" autocomplete="off" aria-label="Search brands">
+                                </div>
+                                <span id="brandCount">Top 10 brands</span>
+                                <button type="button" class="brand-search-clear" onclick="clearBrandSearch()">Clear</button>
+                                <button type="button" id="brandToggleButton" class="brand-search-clear" onclick="toggleAllBrands()">Show all brands</button>
+                                <button type="button" class="brand-search-clear advanced-only" onclick="resetBrandUsageOrder()">Reset order</button>
+                            </div>
+                            <p class="brand-order-note advanced-only">The 10 most-used brands are shown first. Use Show all brands or search to reach the rest.</p>
+                            <div class="brand-grid" id="brandGrid"><label class="brand-card">
+        <input type="checkbox" value="Generic" onchange="selectBrand(this)" class="brand-checkbox sr-only" checked>
+        <span>Other</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Rolex" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Rolex</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Tudor" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Tudor</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Omega" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Omega</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Breitling" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Breitling</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Patek Philippe" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Patek Philippe</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Audemars Piguet" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Audemars Piguet</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Cartier" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Cartier</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Vacheron Constantin" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Vacheron</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Jaeger-LeCoultre" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>JLC</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Richard Mille" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Richard Mille</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="IWC" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>IWC</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Panerai" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Panerai</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Hublot" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Hublot</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="TAG Heuer" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>TAG Heuer</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Rado" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Rado</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Vertex" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Vertex</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Seiko" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Seiko</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Sinn" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Sinn</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Studio Underd0g" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Studio Underd0g</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Lemania" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Lemania</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="CWC" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>CWC</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Chanel" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Chanel</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Girard-Perregaux" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Girard-Perregaux</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Hanhart" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Hanhart</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Casio G-Shock" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Casio G-Shock</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Blancpain" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Blancpain</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Christopher Ward" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Christopher Ward</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Oris" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Oris</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Bremont" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Bremont</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Ebel" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Ebel</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Fears" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Fears</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Raymond Weil" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Raymond Weil</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Grand Seiko" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Grand Seiko</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Longines" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Longines</span>
+    </label></div>
+                            <div id="cartier-official-tools" class="official-brand-tools hidden">
+                                <div class="official-brand-tools-copy">
+                                    <strong>Cartier product verification</strong>
+                                    <span>Open the official Cartier Care product-verification service in a new tab.</span>
+                                </div>
+                                <a class="official-link-button" href="https://cartiercare.cartier.com/en-gb/product/verification" target="_blank" rel="noopener noreferrer">Open Cartier Care <span aria-hidden="true">↗</span></a>
+                            </div>
+                            <div id="jlc-official-tools" class="official-brand-tools hidden">
+                                <div class="official-brand-tools-copy">
+                                    <strong>Jaeger-LeCoultre registration</strong>
+                                    <span>Open the official Jaeger-LeCoultre registration service in a new tab.</span>
+                                </div>
+                                <a class="official-link-button" href="https://services.jaeger-lecoultre.com/en/register" target="_blank" rel="noopener noreferrer">Open JLC Registration <span aria-hidden="true">↗</span></a>
+                            </div>
+                            <div id="panerai-official-tools" class="official-brand-tools hidden">
+                                <div class="official-brand-tools-copy">
+                                    <strong>Panerai registration</strong>
+                                    <span>Open the official Panerai registration service in a new tab.</span>
+                                </div>
+                                <a class="official-link-button" href="https://services.panerai.com/en/register?_gl=1*19s3jtz*_gcl_au*OTgyMjQ1MTE0LjE3ODQxMDIzMDk.*_ga*MTAzMjk0MDIxMS4xNzcxODQwMTA0*_ga_QGG7MD3JKP*czE3ODQxMDIzMDkkbzIkZzEkdDE3ODQxMDIzNjkkajYwJGwwJGgw" target="_blank" rel="noopener noreferrer">Open Panerai Registration <span aria-hidden="true">↗</span></a>
+                            </div>
+                            <div class="section-divider strong-divider"></div>
+                            <div class="input-section-heading heading-blue"><span class="section-number">2</span><span class="section-symbol" aria-hidden="true">#</span><div><strong>Enter watch identifiers</strong><small>Reference and serial number</small></div></div>
+                            <div class="field-grid identifier-grid">
+                                <div class="field">
+                                    <label class="field-label" for="caseRef"><span id="case-label-text">Reference from case</span><span id="case-help-text" class="field-help">Enter the reference code taken directly from the watch case</span></label>
+                                    <div class="input-group">
+                                        <input type="text" id="caseRef" oninput="runRolexForensicAnalysis()" placeholder="Enter the reference from the case" autocomplete="off">
+                                        <button onclick="copyCaseRef()" class="copy-mini">Copy</button>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="fullRef" value="">
+                                <div class="field">
+                                    <label class="field-label" for="serialInput"><span id="serial-label-text">Serial number</span><span id="serial-help-text" class="field-help">Selected-brand identifier check</span></label>
+                                    <div class="input-group">
+                                        <input type="text" id="serialInput" oninput="runRolexForensicAnalysis()" placeholder="Enter the selected brand serial" autocomplete="off">
+                                        <button onclick="copySerialRef()" class="copy-mini">Copy</button>
+                                    </div>
+                                    <div id="omega-serial-options" class="hidden mt-3 rounded-xl border border-blue-900/40 bg-blue-950/20 p-3">
+                                        <div class="field">
+                                            <label class="field-label" for="omegaSerialSeries"><span>Omega serial chart</span><span class="field-help">Speedmaster uses a separate sequence</span></label>
+                                            <select id="omegaSerialSeries" onchange="runRolexForensicAnalysis()">
+                                                <option value="standard" selected>Omega — excluding Speedmaster</option>
+                                                <option value="speedmaster">Omega Speedmaster</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="serialResult" class="hidden mt-3 p-3.5 rounded-lg border text-xs leading-relaxed"></div>
+                                </div>
+                            </div>
+                            <div id="caseResult" class="hidden mt-4 p-3.5 rounded-lg border text-xs leading-relaxed"></div>
+                            <div id="replica-risk-banner" class="replica-risk-banner hidden" role="alert" aria-live="assertive">
+                                <strong id="replica-risk-title">Replica-guide code warning</strong>
+                                <p id="replica-risk-copy"></p>
+                                <p class="replica-risk-action">Pause, escalate, document, and require enhanced authentication before clearance.</p>
+                            </div>
+                            <div id="manual-review-queue-actions" class="advanced-only hidden mt-3 flex flex-wrap gap-2">
+                                <button type="button" class="missing-reference-button" onclick="addCurrentMissingReferenceToQueue()"><span aria-hidden="true">＋</span> Add to research queue</button>
+                                <button type="button" class="missing-reference-button" onclick="copyMissingReferenceReport()"><span aria-hidden="true">⧉</span> Copy research report</button>
+                            </div>
+                            <div id="context-guidance" class="context-guidance" role="tooltip" aria-hidden="true">
+                                <div class="context-guidance-kicker">Relevant guidance</div>
+                                <div id="context-guidance-title" class="context-guidance-title"></div>
+                                <div id="context-guidance-copy" class="context-guidance-copy"></div>
+                                <div id="context-guidance-alert" class="context-guidance-alert hidden"></div>
+                            </div>
+                            <div id="dateEstimateResult" class="hidden mt-4 p-3.5 rounded-lg border text-xs leading-relaxed"></div>
+                            <div id="ageClassificationResult" class="hidden mt-3 p-3.5 rounded-lg border text-xs leading-relaxed"></div>
+                            <div id="counterfeit-match-alert" class="counterfeit-alert hidden" role="alert"></div>
+                        </div>
+                    </section>
+
+                    <section class="panel panel-technical">
+                        <div class="panel-header">
+                            <div>
+                                <div class="panel-kicker">Step 2 · Record</div>
+                                <h2 class="panel-title">Technical inspection</h2>
+                                <p class="panel-description">Open the case, record the movement, assess its condition, then record bracelet or clasp information and detailed observations.</p>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="technical-stack">
+                                <div class="data-zone zone-violet">
+                                    <div class="input-section-heading heading-violet"><span class="section-number">3</span><span class="section-symbol" aria-hidden="true">⚙</span><div><strong>Movement</strong><small>Technology, observed calibre and movement notes</small></div></div>
+                                    <div class="movement-grid">
+                                        <div class="field">
+                                            <label class="field-label" for="movementType"><span>Movement technology</span><span class="field-help">How it is powered and regulated</span></label>
+                                            <select id="movementType" onchange="handleMovementTypeChange()">
+                                                <option value="" selected disabled>Select technology</option>
+                                                <optgroup label="Mechanical">
+                                                    <option value="Mechanical — Automatic (full rotor)">Automatic — full rotor</option>
+                                                    <option value="Mechanical — Automatic (micro-rotor)">Automatic — micro-rotor</option>
+                                                    <option value="Mechanical — Automatic (peripheral rotor)">Automatic — peripheral rotor</option>
+                                                    <option value="Mechanical — Manual wind">Manual wind</option>
+                                                    <option value="Mechanical — Manual wind (fusee/chain)">Manual wind — fusee/chain</option>
+                                                </optgroup>
+                                                <optgroup label="Quartz and electronic">
+                                                    <option value="Quartz — Analogue">Quartz — analogue</option>
+                                                    <option value="Quartz — Digital">Quartz — digital</option>
+                                                    <option value="Quartz — Ana-digi">Quartz — ana-digi</option>
+                                                    <option value="Quartz — Thermocompensated / HAQ">Quartz — thermocompensated / HAQ</option>
+                                                    <option value="Quartz — Solar">Quartz — solar</option>
+                                                    <option value="Meca-quartz">Meca-quartz</option>
+                                                    <option value="Tuning-fork electronic">Tuning-fork electronic</option>
+                                                    <option value="Electronic balance-wheel">Electronic balance-wheel</option>
+                                                    <option value="Electro-mechanical">Electro-mechanical</option>
+                                                </optgroup>
+                                                <optgroup label="Hybrid systems">
+                                                    <option value="Spring Drive — Automatic">Spring Drive — automatic</option>
+                                                    <option value="Spring Drive — Manual wind">Spring Drive — manual wind</option>
+                                                    <option value="Kinetic / Autoquartz">Kinetic / Autoquartz</option>
+                                                    <option value="Hybrid connected">Hybrid connected</option>
+                                                    <option value="Smartwatch">Smartwatch</option>
+                                                </optgroup>
+                                                <optgroup label="Inspection status">
+                                                    <option value="Unknown — Case not opened">Unknown — case not opened</option>
+                                                    <option value="Other / Unclassified">Other / unclassified</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                        <div class="field">
+                                            <label class="field-label" for="movementCalibre"><span id="movement-calibre-label-text">Observed calibre / reference</span><span id="movement-calibre-help-text" class="field-help">Type or choose a known calibre</span></label>
+                                            <input type="text" id="movementCalibre" list="movementCalibreOptions" oninput="runRolexForensicAnalysis()" placeholder="e.g. Cal. 3135" autocomplete="off">
+                                            <datalist id="movementCalibreOptions"></datalist>
+                                            <div id="movementMatchResult" class="hidden mt-3 p-3.5 rounded-lg border text-xs leading-relaxed"></div>
+                                        </div>
+                                    </div>
+                                    <div id="battery-changed-section" class="field movement-secondary hidden">
+                                        <label class="field-label"><span>Battery changed</span><span class="field-help">Shown only for quartz movement technology</span></label>
+                                        <div class="battery-toggle" role="group" aria-label="Battery changed">
+                                            <label><input type="radio" name="batteryChanged" value="Yes" onchange="autoGenerate()"><span>Yes</span></label>
+                                            <label><input type="radio" name="batteryChanged" value="No" onchange="autoGenerate()"><span>No</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="field movement-secondary advanced-only">
+                                        <label class="field-label" for="movementComplications"><span>Movement notes</span><span class="field-help">Optional observations, complications, modules, or unusual architecture</span></label>
+                                        <input type="text" id="movementComplications" oninput="autoGenerate()" placeholder="e.g. chronograph module, co-axial escapement, unusual bridge layout" autocomplete="off">
+                                    </div>
+                                </div>
+
+                                <div class="data-zone zone-amber">
+                                    <div class="input-section-heading heading-amber"><span class="section-number">4</span><span class="section-symbol" aria-hidden="true">◎</span><div><strong>Movement condition</strong><small>Assess condition after the case is opened and the movement has been viewed</small></div></div>
+                                    <div class="condition-grid"><label class="condition-card">
+        <input type="checkbox" data-code="MC1" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>Clean</strong><small>No visible contamination or corrosion</small></span>
+        <span class="condition-code">MC1</span>
+    </label>
+<label class="condition-card">
+        <input type="checkbox" data-code="MC2" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>Dirty</strong><small>Service residue, debris or contamination</small></span>
+        <span class="condition-code">MC2</span>
+    </label>
+<label class="condition-card">
+        <input type="checkbox" data-code="MC3" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>Rusted</strong><small>Oxidation or moisture damage present</small></span>
+        <span class="condition-code">MC3</span>
+    </label>
+<label class="condition-card">
+        <input type="checkbox" data-code="MC4" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>Damaged</strong><small>Broken, distorted or materially compromised</small></span>
+        <span class="condition-code">MC4</span>
+    </label>
+<label class="condition-card">
+        <input type="checkbox" data-code="MC5" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>Modified</strong><small>Non-standard or altered components</small></span>
+        <span class="condition-code">MC5</span>
+    </label>
+<label class="condition-card">
+        <input type="checkbox" data-code="MC6" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>Aged</strong><small>Age-related wear consistent with use</small></span>
+        <span class="condition-code">MC6</span>
+    </label>
+<label class="condition-card condition-wide">
+        <input type="checkbox" data-code="MC7" onchange="autoGenerate()">
+        <span class="condition-copy"><strong>External only</strong><small>Case not opened during this inspection</small></span>
+        <span class="condition-code">MC7</span>
+    </label></div>
+                                </div>
+
+                                <div class="data-zone zone-blue">
+                                    <div class="input-section-heading heading-blue"><span class="section-number">5</span><span class="section-symbol" aria-hidden="true">⌁</span><div><strong>Bracelet and clasp</strong><small>Record the clasp or bracelet reference separately from the movement</small></div></div>
+                                    <div class="field">
+                                        <label class="field-label" for="claspCode"><span id="clasp-label-text">Clasp / bracelet reference</span><span id="clasp-help-text" class="field-help">Selected-brand reference check</span></label>
+                                        <input type="text" id="claspCode" oninput="runRolexForensicAnalysis()" placeholder="Enter clasp or bracelet reference" autocomplete="off">
+                                        <div id="claspResult" class="hidden mt-3 p-3.5 rounded-lg border text-xs leading-relaxed"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="section-divider strong-divider"></div>
+                            <div class="input-section-heading heading-green"><span class="section-number">6</span><span class="section-symbol" aria-hidden="true">✎</span><div><strong>Detailed observations</strong><small>Record the evidence supporting the inspection decision</small></div></div>
+                            <div class="field comments-field">
+                                <label class="field-label" for="comments"><span>Detailed comments</span><span class="field-help">Timing, wear, inconsistencies, supporting observations</span></label>
+                                <textarea id="comments" placeholder="Record the evidence behind the decision, including any unusual wear, finishing discrepancies or limitations of the inspection."></textarea>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="tab-checklist-content" class="hidden">
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div>
+                                <div class="panel-kicker">Step 3 · Verify</div>
+                                <div class="panel-title-line"><span class="panel-title-symbol" aria-hidden="true">☑</span><h2 class="panel-title">Component checklist</h2></div>
+                                <p class="panel-description">Evaluate each major component. Use Review when further reference material is needed; use Fail only where a rejection reason can be stated.</p>
+                            </div>
+                            <div class="legend" aria-label="Checklist status legend">
+                                <span class="legend-item"><i class="legend-dot" style="background:var(--green)"></i>Pass</span>
+                                <span class="legend-item"><i class="legend-dot" style="background:var(--amber)"></i>Review</span>
+                                <span class="legend-item"><i class="legend-dot" style="background:var(--red)"></i>Fail</span>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div id="checklist-wrapper" class="checklist-content">
+                                <div id="checklist-container"></div>
+                            </div>
+                            <span id="checklist-arrow" class="hidden"></span>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="tab-history-content" class="hidden">
+                    <section class="panel">
+                        <div class="panel-header history-toolbar">
+                            <div>
+                                <div class="panel-kicker">Local records</div>
+                                <div class="panel-title-line"><span class="panel-title-symbol" aria-hidden="true">≡</span><h2 class="panel-title">Inspection history</h2></div>
+                                <p class="panel-description">Saved locally in this browser when an inspection is completed and the form is reset.</p>
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="exportHistoryCSV()" class="action-secondary">Export CSV</button>
+                                <button onclick="triggerClearHistory()" class="action-danger">Clear logs</button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-shell">
+                                <table class="w-full text-left border-collapse text-sm min-w-[1040px]">
+                                    <thead>
+                                        <tr class="bg-black/30 text-gray-500 text-[10px] tracking-widest uppercase border-b border-gray-800">
+                                            <th class="p-4 font-bold">Timestamp</th><th class="p-4 font-bold">Brand</th><th class="p-4 font-bold">Case ref</th><th class="p-4 font-bold">Serial</th><th class="p-4 font-bold">Movement</th><th class="p-4 font-bold">Clasp</th><th class="p-4 font-bold">Conditions</th><th class="p-4 font-bold text-center">Status</th><th class="p-4 font-bold text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="history-table-body" class="divide-y divide-gray-800/70"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="tab-missing-content" class="hidden">
+                    <section class="panel">
+                        <div class="panel-header history-toolbar">
+                            <div>
+                                <div class="panel-kicker">Research queue</div>
+                                <div class="panel-title-line"><span class="panel-title-symbol" aria-hidden="true">＋</span><h2 class="panel-title">Missing references</h2></div>
+                                <p class="panel-description">Missing references and authenticator-submitted information requests saved locally for research and subsequent database updates.</p>
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button type="button" onclick="openMissingInformationReport()" class="action-secondary report-missing-action">New report</button>
+                                <button onclick="copyMissingQueue()" class="action-secondary">Copy all</button>
+                                <button onclick="exportMissingQueueCSV()" class="action-secondary">Export CSV</button>
+                                <button onclick="clearMissingQueue()" class="action-danger">Clear queue</button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div id="missing-queue-empty" class="p-6 text-sm text-gray-500 italic hidden">No missing references have been saved.</div>
+                            <div class="table-shell">
+                                <table class="w-full text-left border-collapse text-sm min-w-[900px]">
+                                    <thead>
+                                        <tr class="bg-black/30 text-gray-500 text-[10px] tracking-widest uppercase border-b border-gray-800">
+                                            <th class="p-4 font-bold">Added</th><th class="p-4 font-bold">Brand</th><th class="p-4 font-bold">Case reference</th><th class="p-4 font-bold">Observed calibre</th><th class="p-4 font-bold">Request</th><th class="p-4 font-bold">Inspection ID</th><th class="p-4 font-bold text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="missing-queue-body" class="divide-y divide-gray-800/70"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="tab-counterfeit-content" class="hidden">
+                    <section class="panel">
+                        <div class="panel-header history-toolbar">
+                            <div>
+                                <div class="panel-kicker">Local risk intelligence</div>
+                                <div class="panel-title-line"><span class="panel-title-symbol" aria-hidden="true">⚠</span><h2 class="panel-title">Counterfeit register</h2></div>
+                                <p class="panel-description">Locally records confirmed counterfeit watches and warns when the same serial number or reference is seen again.</p>
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="exportCounterfeitCSV()" class="action-secondary">Export CSV</button>
+                                <button onclick="clearCounterfeitRegister()" class="action-danger">Clear register</button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="mb-5 rounded-xl border border-amber-500/25 bg-amber-500/5 p-4">
+                                <div class="flex flex-wrap items-start justify-between gap-3">
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-[.14em] text-amber-400">Built-in historical intelligence</div>
+                                        <div class="mt-1 text-sm font-bold text-white">236 cleaned known-fake serial values</div>
+                                        <p class="mt-2 max-w-3xl text-xs leading-relaxed text-gray-400">Imported from the 12-page “Serial Numbers of Known Fake Watches” document. This list is read-only and travels with the application. A match is a strong warning for comparison, not automatic proof that the current watch is counterfeit.</p>
+                                    </div>
+                                    <div class="rounded-lg border border-gray-700 bg-black/20 px-3 py-2 text-right">
+                                        <div class="text-[10px] uppercase tracking-wider text-gray-500">Repeated values</div>
+                                        <div class="text-lg font-black text-amber-300">15</div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-[10px] leading-relaxed text-gray-500">Cleaning exclusions: blank/N/A entries, values shorter than five characters, and the date-formatted value 20230318. Original spellings were normalised for matching.</div>
+                            </div>
+                            <div class="mb-5 rounded-xl border border-red-500/25 bg-red-500/5 p-4">
+                                <div class="flex flex-wrap items-center justify-between gap-4">
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-[.14em] text-red-400">Record current inspection</div>
+                                        <p class="mt-1 max-w-2xl text-xs leading-relaxed text-gray-400">Use this only after the current watch has been judged counterfeit. The current brand, reference, serial, calibre and comments will be added to the editable team register.</p>
+                                    </div>
+                                    <button type="button" onclick="recordCurrentCounterfeit()" class="counterfeit-action">Record current watch as counterfeit</button>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="text-[10px] font-black uppercase tracking-[.14em] text-red-400">Editable team register</div>
+                                <p class="mt-1 text-xs text-gray-500">Records confirmed counterfeit watches found by the team, including reference, calibre, notes and repeat sightings.</p>
+                            </div>
+                            <div id="counterfeit-empty" class="p-6 text-sm text-gray-500 italic hidden">No locally confirmed counterfeit watches have been recorded.</div>
+                            <div class="table-shell">
+                                <table class="w-full text-left border-collapse text-sm min-w-[1120px]">
+                                    <thead><tr class="bg-black/30 text-gray-500 text-[10px] tracking-widest uppercase border-b border-gray-800">
+                                        <th class="p-4 font-bold">First seen</th><th class="p-4 font-bold">Last seen</th><th class="p-4 font-bold">Count</th><th class="p-4 font-bold">Brand</th><th class="p-4 font-bold">Reference</th><th class="p-4 font-bold">Serial</th><th class="p-4 font-bold">Calibre</th><th class="p-4 font-bold">Notes</th><th class="p-4 font-bold text-right">Actions</th>
+                                    </tr></thead>
+                                    <tbody id="counterfeit-table-body" class="divide-y divide-gray-800/70"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+
+
+            <details id="watch-research-notes" class="watch-research-notes" ontoggle="handleWatchResearchNotesToggle()">
+                <summary>
+                    <div>
+                        <div class="watch-research-notes-title">Research notes for this watch</div>
+                        <div class="watch-research-notes-hint">Open this when something is missing, unclear or worth researching for a future version.</div>
+                    </div>
+                    <span class="watch-research-notes-toggle">+</span>
+                </summary>
+                <div class="watch-research-notes-body">
+                    <div id="watch-research-note-snapshot" class="watch-research-note-snapshot"></div>
+                    <textarea id="watch-research-note-text" class="watch-research-note-textarea" placeholder="Write what is missing, unclear, incorrect, or what should be researched for next time."></textarea>
+                    <div class="watch-research-note-footer">
+                        <div id="watch-research-note-status" class="watch-research-note-status">Not saved.</div>
+                        <div class="watch-research-note-actions">
+                            <button type="button" class="action-secondary" onclick="clearWatchResearchNote()">Clear</button>
+                            <button type="button" class="save-action" onclick="saveWatchResearchNote()">Save for research</button>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <aside id="preview-section">
+                <div class="review-card">
+                    <div class="review-head">
+                        <div class="review-title-row"><h2 class="review-title">Authentication note</h2><span class="live-pill">Live preview</span></div>
+                        <p class="review-copy">This final note contains recorded inspection facts only. Live decoder guidance and automated warnings are excluded.</p>
+                    </div>
+                    <div class="note-window"><div id="output">Waiting for input...</div></div>
+                    <div class="review-tip">The component checklist supports the inspection decision but is not automatically inserted into the note. Record decisive failures in Detailed Comments.</div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+
+    <div id="research-report-overlay" class="research-report-overlay" role="dialog" aria-modal="true" aria-labelledby="research-report-title" onclick="closeMissingInformationReportFromBackdrop(event)">
+        <div class="research-report-modal">
+            <div class="research-report-head">
+                <div>
+                    <div class="research-report-kicker">Database research request</div>
+                    <div id="research-report-title" class="research-report-title">Report missing or incorrect information</div>
+                    <div class="research-report-copy">The current watch data is inserted automatically. Describe what the app failed to provide, what appears incorrect, or what should be added for the next database update.</div>
+                </div>
+                <button type="button" class="research-report-close" onclick="closeMissingInformationReport()" aria-label="Close research report">×</button>
+            </div>
+            <div class="research-report-body">
+                <div id="research-report-snapshot" class="research-report-snapshot"></div>
+
+                <div class="research-report-field">
+                    <label for="research-report-type">What needs attention?</label>
+                    <select id="research-report-type">
+                        <option value="Missing reference mapping">Missing reference or model mapping</option>
+                        <option value="Incorrect information">Information appears incorrect</option>
+                        <option value="Missing calibre guidance">Missing calibre or movement guidance</option>
+                        <option value="Missing production date">Missing or incorrect production date</option>
+                        <option value="Missing serial guidance">Missing or incorrect serial guidance</option>
+                        <option value="Missing authentication check">Missing authentication check</option>
+                        <option value="Other missing information">Other missing information</option>
+                    </select>
+                </div>
+
+                <div class="research-report-field">
+                    <label for="research-report-details">What is missing or wrong?</label>
+                    <textarea id="research-report-details" placeholder="Example: The reference is recognised, but the expected calibre and approximate production dates are missing."></textarea>
+                </div>
+
+                <div class="research-report-field">
+                    <label for="research-report-evidence">Evidence or useful observation <span class="text-gray-500">(optional)</span></label>
+                    <textarea id="research-report-evidence" placeholder="Example: Caseback wording, movement marking, measured case size, dial text, official URL, catalogue page or another detail that may help research."></textarea>
+                </div>
+
+                <div>
+                    <div class="research-report-field"><label>Current live lookup output</label></div>
+                    <div id="research-report-current" class="research-report-current">No live lookup information recorded.</div>
+                </div>
+
+                <div class="research-report-note">Saved reports remain in this browser’s Research Queue. They are not sent automatically. Use Copy all or Export CSV from the queue and provide the reports with the next Watch Auth Pro update.</div>
+            </div>
+            <div class="research-report-actions">
+                <button type="button" class="action-secondary" onclick="closeMissingInformationReport()">Cancel</button>
+                <button type="button" class="action-secondary" onclick="saveMissingInformationReport(true)">Save and copy report</button>
+                <button type="button" class="save-action" onclick="saveMissingInformationReport(false)">Save to research queue</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="live-summary-card" class="live-summary-card" aria-live="polite">
+        <div class="live-summary-head">
+            <div>
+                <div class="live-summary-title">Live watch summary</div>
+                <div class="live-summary-subtitle">Updates as information is entered.</div>
+            </div>
+            <div class="live-summary-controls">
+                <span id="live-summary-state" class="live-summary-state">Waiting</span>
+                <button type="button" class="live-summary-control" onclick="toggleLiveSummary()" title="Minimise or restore live summary" aria-label="Minimise or restore live summary">−</button>
+            </div>
+        </div>
+        <div id="live-watch-summary" class="live-summary-body">
+            <div class="live-summary-empty">Enter a brand or reference.</div>
+        </div>
+    </div>
+
+    <div id="footer-actions">
+        <div class="footer-inner">
+            <div class="footer-context"><strong>Current inspection</strong><span>Copy the note at any time, or save the inspection and begin the next watch.</span></div>
+            <div class="footer-buttons">
+                <button onclick="copyNote()" class="primary-action">Copy authentication note</button>
+                <button onclick="resetAll()" class="save-action">Save &amp; start next</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed inset-y-0 right-0 w-full max-w-md bg-gray-900 border-l border-gray-800 shadow-2xl z-[150] transform translate-x-full drawer-transition flex flex-col" id="rolex-drawer">
+<!-- Drawer Header -->
+<div class="p-5 border-b border-gray-800 flex justify-between items-center bg-gray-950">
+<div>
+<h3 id="drawer-brand-title" class="text-sm font-black text-white uppercase tracking-widest">Brand Reference</h3>
+<p id="drawer-brand-subtitle" class="text-[10px] text-gray-400 uppercase mt-0.5 tracking-wider">Selected-brand inspection guidance</p>
+</div>
+<button class="text-gray-400 hover:text-white p-2 text-lg" onclick="toggleDrawer()">✕</button>
+</div>
+<!-- Drawer Content -->
+<div class="p-6 overflow-y-auto flex-1 space-y-6">
+<!-- Reference Codes Quick Decoder Sheet -->
+<div class="bg-black/50 border border-gray-800 rounded-xl p-4">
+<h4 id="drawer-live-title" class="text-xs font-bold text-blue-400 uppercase mb-3 tracking-wider">Live selected-brand output</h4>
+<div class="space-y-3 text-xs" id="drawer-live-decoding">
+<p class="text-gray-500 italic">Enter a Case Reference or Serial number to begin decoding...</p>
+</div>
+</div>
+<div id="brand-reference-sections" class="hidden space-y-4">
+<div class="bg-black/40 border border-gray-800 rounded-xl p-4">
+<h4 id="brand-reference-heading" class="text-xs font-bold text-amber-500 uppercase mb-2 tracking-wider">Selected brand inspection focus</h4>
+<p id="brand-reference-summary" class="text-xs text-gray-400 leading-relaxed"></p>
+</div>
+<div id="brand-reference-flags" class="space-y-3"></div>
+</div>
+<div id="rolex-reference-sections" class="space-y-6">
+<!-- Historical Material Table -->
+<div>
+<h4 class="text-xs font-bold text-amber-500 uppercase mb-2 tracking-wider">Rolex Case Material Codes</h4>
+<div class="border border-gray-850 rounded-lg overflow-hidden text-[11px]">
+<div class="grid grid-cols-4 bg-gray-950 p-2 font-bold text-gray-400 border-b border-gray-800 uppercase tracking-tighter">
+<div class="col-span-1">Code</div>
+<div class="col-span-3">Metal / Material Composition</div>
+</div>
+<div class="divide-y divide-gray-850 max-h-48 overflow-y-auto">
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">0</div><div class="col-span-3 text-gray-300">Stainless Steel (Oystersteel)</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">1</div><div class="col-span-3 text-gray-300">Steel &amp; Everose Gold (Two-Tone)</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">2</div><div class="col-span-3 text-gray-300">Steel &amp; Platinum (Rolesium)</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">3</div><div class="col-span-3 text-gray-300">Steel &amp; Yellow Gold (Two-Tone)</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">4</div><div class="col-span-3 text-gray-300">Steel &amp; White Gold (Two-Tone)</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">5</div><div class="col-span-3 text-gray-300">18k Everose Gold</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">6</div><div class="col-span-3 text-gray-300">950 Platinum</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">7</div><div class="col-span-3 text-gray-300">RLX Titanium / 14k Yellow Gold</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">8</div><div class="col-span-3 text-gray-300">18k Yellow Gold</div></div>
+<div class="grid grid-cols-4 p-2 hover:bg-gray-800/30"><div class="font-bold font-mono">9</div><div class="col-span-3 text-gray-300">18k White Gold</div></div>
+</div>
+</div>
+</div>
+<!-- Historical Bezel Table -->
+<div>
+<h4 class="text-xs font-bold text-amber-500 uppercase mb-2 tracking-wider">Rolex Bezel Style Codes</h4>
+<div class="border border-gray-850 rounded-lg overflow-hidden text-[11px]">
+<div class="grid grid-cols-4 bg-gray-950 p-2 font-bold text-gray-400 border-b border-gray-800 uppercase tracking-tighter">
+<div class="col-span-1">Code</div>
+<div class="col-span-3">Bezel Configuration</div>
+</div>
+<div class="divide-y divide-gray-850">
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">0</div><div class="col-span-3 text-gray-300">Smooth / Domed / Polished</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">1</div><div class="col-span-3 text-gray-300">Rotating Sports Bezel</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">2</div><div class="col-span-3 text-gray-300">Engraved</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">3</div><div class="col-span-3 text-gray-300">Fluted</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">4</div><div class="col-span-3 text-gray-300">Bark Finish / Gem-Set</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">5</div><div class="col-span-3 text-gray-300">Pyramid (Discontinued)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">6</div><div class="col-span-3 text-gray-300">Turn-O-Graph / Rotatable</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">7</div><div class="col-span-3 text-gray-300">Various (e.g. Explorer II Fixed)</div></div>
+</div>
+</div>
+</div>
+<!-- Historical Letter Codes -->
+<div>
+<h4 class="text-xs font-bold text-amber-500 uppercase mb-2 tracking-wider">Rolex Bezel Color &amp; Suffixes</h4>
+<div class="border border-gray-850 rounded-lg overflow-hidden text-[11px] divide-y divide-gray-850 max-h-56 overflow-y-auto">
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">LN</div><div class="col-span-3 text-gray-300">Lunette Noir (Black Bezel)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">LV</div><div class="col-span-3 text-gray-300">Lunette Verte (Green Bezel)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">LB</div><div class="col-span-3 text-gray-300">Lunette Bleu (Blue Bezel)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">BLNR</div><div class="col-span-3 text-gray-300">Bleu Noir (Blue/Black - Batman)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">BLRO</div><div class="col-span-3 text-gray-300">Bleu Rouge (Blue/Red - Pepsi)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">CHNR</div><div class="col-span-3 text-gray-300">Chocolate Noir (Brown/Black)</div></div>
+<div class="grid grid-cols-4 p-2"><div class="font-bold font-mono">GV</div><div class="col-span-3 text-gray-300">Glace Verte (Green Sapphire)</div></div>
+</div>
+</div>
+<div>
+<h4 class="text-xs font-bold text-amber-500 uppercase mb-2 tracking-wider">Rolex Movement Master Cross-Reference</h4>
+<p class="text-[11px] text-gray-400 leading-relaxed mb-3">Search vintage, transitional and modern case references. Multi-calibre results require production-period verification.</p>
+<input id="rolex-movement-search" type="text" oninput="renderRolexMovementMasterTable(this.value)" placeholder="Search reference, family or calibre" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-2.5 text-xs outline-none focus:border-blue-600 mb-3">
+<div id="rolex-movement-master-table" class="border border-gray-850 rounded-lg overflow-hidden text-[11px]"></div>
+</div>
+</div>
+</div>
+</div>
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[200] flex items-center justify-center hidden opacity-0 transition-opacity duration-300" id="confirm-modal">
+<div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl max-w-sm w-full mx-4 shadow-2xl">
+<h3 class="text-base font-bold text-white mb-2 uppercase tracking-wider" id="modal-title">Confirm Action</h3>
+<p class="text-xs text-gray-400 mb-6 leading-relaxed" id="modal-message">Are you sure you want to proceed?</p>
+<div class="flex gap-3 justify-end">
+<button class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-xs font-bold rounded-lg uppercase tracking-wider transition text-gray-400 hover:text-white" id="modal-cancel-btn">Cancel</button>
+<button class="px-4 py-2 bg-red-600 hover:bg-red-500 text-xs font-bold rounded-lg uppercase tracking-wider transition text-white" id="modal-confirm-btn">Proceed</button>
+</div>
+</div>
+</div>
+    <div class="fixed top-8 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-8 py-3 rounded-full shadow-2xl opacity-0 transition-opacity pointer-events-none z-[100] font-bold text-sm" id="toast">COPIED TO CLIPBOARD</div>
+    <script src="data/watch-reference-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
