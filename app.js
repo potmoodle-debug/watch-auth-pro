@@ -246,8 +246,8 @@ const categories = [
 
         function lookupOmegaReference(value) {
             const key = normaliseOmegaReference(value);
-            if (!key) return null;
             const cleanDisplay = String(value || '').trim().toUpperCase().replace(/^OMEGA\s*/i, '');
+            if (!key && !cleanDisplay) return null;
             const rule = OMEGA_REFERENCE_RULES.find(entry => {
                 if (Array.isArray(entry.refs)) {
                     return entry.refs.some(ref => normaliseOmegaReference(ref) === key);
@@ -258,7 +258,7 @@ const categories = [
                 }
                 return false;
             });
-            return { key, rule };
+            return { key: key || cleanDisplay, rule };
         }
 
         function decodeOmegaReferenceFormat(value) {
@@ -333,7 +333,7 @@ const categories = [
             if (!result || !result.key) return null;
             if (result.rule) {
                 const expected = result.rule.calibre.map(cal => `Cal. ${cal}`).join(' or ');
-                renderInformationBox(box, 'info', 'Omega reference identified',
+                renderInformationBox(box, result.rule.collectionOnly ? 'warning' : 'info', result.rule.collectionOnly ? 'Omega collection identified — exact reference required' : 'Omega reference identified',
                     `<strong>${result.rule.family}</strong> · ${result.rule.size}<br>` +
                     `Expected movement: <strong>${expected}</strong> · ${result.rule.reserve}<br>` +
                     `Movement: <strong>${result.rule.technology}</strong><br>` +
@@ -344,11 +344,19 @@ const categories = [
                     const observed = normaliseCalibreLoose(observedCalibre);
                     if (observed) {
                         const matches = result.rule.calibre.some(cal => normaliseCalibreLoose(cal) === observed);
-                        renderInformationBox(movementBox, matches ? 'success' : 'danger', matches ? 'Omega calibre matches reference' : 'Omega calibre mismatch',
-                            matches
-                                ? `Observed <strong>${escapeHtml(observedCalibre)}</strong> is consistent with the expected ${expected}.`
-                                : `Observed <strong>${escapeHtml(observedCalibre)}</strong> does not match the expected ${expected}. Recheck the full reference and movement marking before reaching a conclusion.`
-                        );
+                        const collectionOnly = Boolean(result.rule.collectionOnly);
+                        const level = matches ? 'success' : (collectionOnly ? 'warning' : 'danger');
+                        const title = matches
+                            ? (collectionOnly ? 'Omega family/calibre combination plausible' : 'Omega calibre matches reference')
+                            : (collectionOnly ? 'Exact Omega reference still required' : 'Omega calibre mismatch');
+                        const message = matches
+                            ? (collectionOnly
+                                ? `Observed <strong>${escapeHtml(observedCalibre)}</strong> is documented within this Omega collection, but the collection name alone does not identify the exact watch reference.`
+                                : `Observed <strong>${escapeHtml(observedCalibre)}</strong> is consistent with the expected ${expected}.`)
+                            : (collectionOnly
+                                ? `Observed <strong>${escapeHtml(observedCalibre)}</strong> is not one of the embedded examples for this broad collection entry. Do not treat that as a mismatch from the collection name alone; record the complete case/PIC reference.`
+                                : `Observed <strong>${escapeHtml(observedCalibre)}</strong> does not match the expected ${expected}. Recheck the full reference and movement marking before reaching a conclusion.`);
+                        renderInformationBox(movementBox, level, title, message);
                     }
                 }
                 return { ...result, recognised: !result.rule.manualReview };
