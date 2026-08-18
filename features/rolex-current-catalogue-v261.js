@@ -180,7 +180,10 @@
   function install() {
     if (!Array.isArray(window.ROLEX_CURRENT_CATALOGUE)) return;
 
-    if (typeof DATABASE_META === 'object' && DATABASE_META) {
+    const currentMetaVersion = typeof DATABASE_META === 'object' && DATABASE_META ? String(DATABASE_META.version || '0') : '0';
+    const currentMetaNumber = Number(currentMetaVersion.split('.').map(part => String(Number(part) || 0).padStart(3, '0')).join(''));
+    const rolexLayerNumber = Number('2.61.0'.split('.').map(part => String(Number(part) || 0).padStart(3, '0')).join(''));
+    if (typeof DATABASE_META === 'object' && DATABASE_META && currentMetaNumber < rolexLayerNumber) {
       DATABASE_META.version = '2.61.0';
       DATABASE_META.updated = '18 August 2026';
       DATABASE_META.scope = 'Official current Rolex catalogue: 1,465 configurations across 157 base references, retained separately from historical and movement evidence';
