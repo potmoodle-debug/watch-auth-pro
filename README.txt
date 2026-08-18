@@ -1,4 +1,4 @@
-WATCH AUTH PRO v2.61.0 — DEPLOYMENT-READY PACKAGE
+WATCH AUTH PRO v2.62.0 — DEPLOYMENT-READY PACKAGE
 
 CORRECT FILE STRUCTURE
 
@@ -8,6 +8,7 @@ app.js
 .nojekyll
 data/
   watch-reference-data.js
+  watch-reference-data-v262.js
   rolex-current-catalogue-v261.js
 features/
   rolex-current-catalogue-v261.js
@@ -28,3 +29,6 @@ VERIFIED REFERENCES
 - JavaScript syntax checks passed
 - Official current Rolex UK catalogue: 1,465 configurations / 157 base references
 - Current-catalogue data remains separate from vintage, movement and replica-reference evidence
+- 18 August 2026 missing-reference report researched and integrated
+- Exact/short-reference coverage added or repaired for Omega, Cartier, Tudor and Christopher Ward
+- Collection-name entries remain clearly labelled as incomplete and require the full case/reference number
