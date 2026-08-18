@@ -1,4 +1,4 @@
-WATCH AUTH PRO v2.53.0 — DEPLOYMENT-READY PACKAGE
+WATCH AUTH PRO v2.61.0 — DEPLOYMENT-READY PACKAGE
 
 CORRECT FILE STRUCTURE
 
@@ -8,6 +8,9 @@ app.js
 .nojekyll
 data/
   watch-reference-data.js
+  rolex-current-catalogue-v261.js
+features/
+  rolex-current-catalogue-v261.js
 
 IMPORTANT
 1. Extract this ZIP to a normal folder on your computer first.
@@ -23,3 +26,5 @@ VERIFIED REFERENCES
 - index.html loads data/watch-reference-data.js
 - index.html loads app.js
 - JavaScript syntax checks passed
+- Official current Rolex UK catalogue: 1,465 configurations / 157 base references
+- Current-catalogue data remains separate from vintage, movement and replica-reference evidence
