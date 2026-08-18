@@ -14,10 +14,6 @@
     confidence: 'High-confidence exact-reference/calibre match'
   };
 
-  function normaliseCalibre(value) {
-    return String(value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-  }
-
   function parsePeriod(periodText) {
     const text = String(periodText || '');
     const years = (text.match(/\b(?:18|19|20)\d{2}\b/g) || []).map(Number);
@@ -116,17 +112,17 @@
             classification = 'VINTAGE';
             tone = 'info';
             explanation = `The best available production window (${intersection.min}–${intersection.max}) falls entirely before the current 20-year boundary.`;
-          } else if (intersection.min >= cutoffYear) {
+          } else if (intersection.min > cutoffYear) {
             classification = 'MODERN';
             tone = 'info';
-            explanation = `The best available production window (${intersection.min}–${intersection.max}) does not fall entirely beyond the 20-year threshold.`;
+            explanation = `The best available production window (${intersection.min}–${intersection.max}) falls entirely after the current 20-year boundary.`;
           } else {
             classification = 'CHECK DATE';
             tone = 'warn';
-            explanation = `The best available production window (${intersection.min}–${intersection.max}) crosses the 20-year boundary. Vintage status cannot be determined without a narrower date.`;
+            explanation = `The best available production window (${intersection.min}–${intersection.max}) reaches or crosses the current 20-year boundary. A year-only estimate at the cutoff cannot establish whether the watch is already more than 20 years old.`;
           }
 
-          renderInformationBox(box, tone, `Age class: ${classification}`, `${explanation}<div class="mt-2 text-[10px] opacity-75">Rule used: Vintage means more than 20 years old. Where a range crosses the boundary, the app now leaves the status unresolved rather than guessing.</div>`);
+          renderInformationBox(box, tone, `Age class: ${classification}`, `${explanation}<div class="mt-2 text-[10px] opacity-75">Rule used: Vintage means more than 20 years old. Where a range reaches or crosses the boundary, the app leaves the status unresolved rather than guessing.</div>`);
         };
       }
     } catch (error) {
