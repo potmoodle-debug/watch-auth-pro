@@ -1,4 +1,4 @@
-WATCH AUTH PRO v2.62.0 — DEPLOYMENT-READY PACKAGE
+WATCH AUTH PRO v2.63.0 — DEPLOYMENT-READY PACKAGE
 
 CORRECT FILE STRUCTURE
 
@@ -12,6 +12,7 @@ data/
   rolex-current-catalogue-v261.js
 features/
   rolex-current-catalogue-v261.js
+  rma-return-condition-v263.js
 
 IMPORTANT
 1. Extract this ZIP to a normal folder on your computer first.
@@ -32,3 +33,4 @@ VERIFIED REFERENCES
 - 18 August 2026 missing-reference report researched and integrated
 - Exact/short-reference coverage added or repaired for Omega, Cartier, Tudor and Christopher Ward
 - Collection-name entries remain clearly labelled as incomplete and require the full case/reference number
+- RMA quick-add includes “Watch returned in same condition as shipped to buyer.”
