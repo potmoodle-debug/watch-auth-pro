@@ -1,11 +1,11 @@
 /* Watch Auth Pro — compact watch information panel
-   Version 2.64.0 — 19 August 2026
+   Feature introduced in 2.64.0; startup version authority updated for 2.65.0.
    Replaces scattered reference-result boxes with one click-to-open panel.
 */
 if (typeof DATABASE_META !== 'undefined') {
-  DATABASE_META.version = '2.64.0';
-  DATABASE_META.updated = '19 August 2026';
-  DATABASE_META.scope = 'Reference, serial, calibre, dating, catalogue and clasp results consolidated into one concise click-to-open watch information panel.';
+  DATABASE_META.version = '2.65.0';
+  DATABASE_META.updated = '20 August 2026';
+  DATABASE_META.scope = 'v2.65.0 researched reference data plus current Watch Auth Pro features';
 }
 
 (() => {
@@ -206,7 +206,18 @@ if (typeof DATABASE_META !== 'undefined') {
     });
   }
 
+  function enforceCurrentVersion() {
+    if (typeof DATABASE_META !== 'undefined' && DATABASE_META) {
+      DATABASE_META.version = '2.65.0';
+      DATABASE_META.updated = '20 August 2026';
+      DATABASE_META.scope = 'v2.65.0 researched reference data plus current Watch Auth Pro features';
+    }
+    document.title = 'Watch Auth Pro v2.65.0 — Reference Data Update';
+    if (typeof updateDatabaseStatus === 'function') updateDatabaseStatus();
+  }
+
   function initialise() {
+    enforceCurrentVersion();
     injectStyles();
     if (!createPanel()) return;
     observeSources();
@@ -217,6 +228,7 @@ if (typeof DATABASE_META !== 'undefined') {
       if (WATCH_INPUT_IDS.has(event.target?.id) || event.target?.classList?.contains('brand-checkbox')) queueMicrotask(synchronise);
     });
     synchronise();
+    queueMicrotask(enforceCurrentVersion);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialise, { once: true });
