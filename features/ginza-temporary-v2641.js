@@ -36,7 +36,7 @@
       .ginza-temp-choice input { accent-color:#2563eb; width:17px; height:17px; flex:0 0 auto; }
       .ginza-temp-summary { margin-top:16px; padding:14px 16px; border-radius:12px; border:1px solid rgba(59,130,246,.25); background:rgba(37,99,235,.07); }
       .ginza-temp-summary-title { font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:900; color:#60a5fa; margin-bottom:6px; }
-      .ginza-temp-summary-text { font-size:13px; line-height:1.55; color:#d1d5db; }
+      .ginza-temp-summary-text { font-size:13px; line-height:1.65; color:#d1d5db; white-space:pre-line; }
       @media (max-width: 900px) {
         .ginza-temp-row { grid-template-columns:1fr 1fr; }
         .ginza-temp-component { grid-column:1 / -1; margin-bottom:2px; }
@@ -61,7 +61,8 @@
     const changes = COMPONENTS
       .map(([key, label]) => state[key] !== 'Original' ? `${label}: ${state[key]}` : null)
       .filter(Boolean);
-    return changes.length ? `Component changes: ${changes.join('; ')}.` : '';
+    return changes.length ? `Component changes:
+${changes.map(change => `• ${change}`).join('\n')}` : '';
   }
 
   function updateSummary() {
