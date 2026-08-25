@@ -1,8 +1,9 @@
-WATCH AUTH PRO v2.67.0 — DEPLOYMENT-READY PACKAGE
+WATCH AUTH PRO v2.67.1 — DEPLOYMENT-READY PACKAGE
 
 CURRENT UPDATE — 25 AUGUST 2026
-- v2.67.0 is a researched and cleaned missing-reference update built on top of v2.66.1.
-- Source batch: watch-auth-pro-missing-references-v2.65.0.csv.
+- v2.67.1 fixes the visible database-version banner so the header reflects the actual loaded DATABASE_META version after the older UI status code runs.
+- v2.67.0 remains the researched and cleaned missing-reference data update built on top of v2.66.1.
+- Source batch for the reference update: watch-auth-pro-missing-references-v2.65.0.csv.
 - Exact/reference-family mappings added or repaired across Omega, Cartier, Tudor, Breitling, TAG Heuer, Longines, Jaeger-LeCoultre, Grand Seiko, Seiko, IWC, Bremont, Oris, Montblanc, Hamilton, Christopher Ward, Schofield, Nivada and Swatch.
 - Collection-name-only inputs are retained as manual-review guidance instead of being treated as exact references.
 - Obvious input errors were cleaned, including Jaeger-LeCoultre 250.8.86 being mis-entered under Generic.
@@ -27,14 +28,16 @@ data/
   watch-reference-data-v262.js
   rolex-current-catalogue-v261.js
 features/
+  version-banner-v2671.js
   rolex-current-catalogue-v261.js
   rma-return-condition-v263.js
   compact-watch-information-v264.js
 
 IMPORTANT
 1. GitHub Pages should deploy from main, /(root).
-2. data/watch-reference-data.js is the loader and now identifies v2.67.0.
-3. Do not remove the older data layers; v2.67.0 is additive and intentionally sits on top of v2.66.1 and earlier reference layers.
+2. data/watch-reference-data.js is the loader and now identifies v2.67.1.
+3. v2.67.1 is a display-layer bugfix; the researched reference data remains the v2.67.0 layer.
+4. Do not remove the older data layers; the update is additive and intentionally sits on top of v2.66.1 and earlier reference layers.
 
 VERIFIED EXISTING FEATURES RETAINED
 - Official current Rolex catalogue data remains separate from vintage, movement and replica-reference evidence.
