@@ -15,7 +15,7 @@
   ];
   const OPTIONS = ['Original', 'Replica', 'Generic', 'Customized'];
   const state = Object.fromEntries(COMPONENTS.map(([key]) => [key, 'Original']));
-  let outputObserver = null;
+  let lastGeneratedNote = '';
 
   function addStyles() {
     if (document.getElementById('ginza-temp-styles')) return;
@@ -37,7 +37,6 @@
       .ginza-temp-summary { margin-top:16px; padding:14px 16px; border-radius:12px; border:1px solid rgba(59,130,246,.25); background:rgba(37,99,235,.07); }
       .ginza-temp-summary-title { font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:900; color:#60a5fa; margin-bottom:6px; }
       .ginza-temp-summary-text { font-size:13px; line-height:1.55; color:#d1d5db; }
-      [data-ginza-note='true'] { display:block; margin-top:.65em; }
       @media (max-width: 900px) {
         .ginza-temp-row { grid-template-columns:1fr 1fr; }
         .ginza-temp-component { grid-column:1 / -1; margin-bottom:2px; }
@@ -72,24 +71,36 @@
     el.textContent = text || 'No Ginza component changes recorded. All components are set to Original.';
   }
 
+  // Feed Ginza differences into the app's existing Detailed Comments field.
+  // The normal Watch Auth Pro note generator already includes that field, so this
+  // keeps Ginza changes inside the real Authentication Note instead of merely
+  // drawing extra text inside the preview DOM.
   function applyToAuthenticationNote() {
-    const output = document.getElementById('output');
-    if (!output) return;
+    const comments = document.getElementById('comments');
+    if (!comments) return;
 
-    if (outputObserver) outputObserver.disconnect();
-    output.querySelectorAll('[data-ginza-note="true"]').forEach(node => node.remove());
+    let value = String(comments.value || '');
 
-    const text = buildChangeText();
-    if (text) {
-      const node = document.createElement('span');
-      node.dataset.ginzaNote = 'true';
-      node.textContent = text;
-      output.appendChild(node);
+    if (lastGeneratedNote) {
+      const escaped = lastGeneratedNote.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      value = value
+        .replace(new RegExp(`(?:^|\\n)${escaped}(?=\\n|$)`, 'g'), '')
+        .replace(/^\n+|\n+$/g, '')
+        .replace(/\n{3,}/g, '\n\n');
     }
 
-    if (outputObserver) {
-      outputObserver.observe(output, { childList: true, subtree: true, characterData: true });
-    }
+    const next = buildChangeText();
+    if (next) value = value.trim() ? `${value.trim()}\n${next}` : next;
+
+    comments.value = value;
+    lastGeneratedNote = next;
+
+    // Trigger the application's normal live-note regeneration.
+    comments.dispatchEvent(new Event('input', { bubbles: true }));
+    comments.dispatchEvent(new Event('change', { bubbles: true }));
+
+    // Fallback for builds where the comments listener is not input-driven.
+    if (typeof window.updateScore === 'function') window.updateScore();
   }
 
   function setAllOriginal() {
@@ -208,18 +219,13 @@
     const originalReset = window.resetAll;
     window.resetAll = function() {
       const result = originalReset.apply(this, arguments);
-      setAllOriginal();
+      lastGeneratedNote = '';
+      COMPONENTS.forEach(([key]) => { state[key] = 'Original'; });
+      document.querySelectorAll('#tab-ginza-content input[type="radio"][value="Original"]').forEach(input => { input.checked = true; });
+      updateSummary();
       return result;
     };
     window.__ginzaResetHookInstalled = true;
-  }
-
-  function observeAuthenticationNote() {
-    const output = document.getElementById('output');
-    if (!output || outputObserver) return;
-    outputObserver = new MutationObserver(() => applyToAuthenticationNote());
-    outputObserver.observe(output, { childList: true, subtree: true, characterData: true });
-    applyToAuthenticationNote();
   }
 
   function init() {
@@ -227,7 +233,6 @@
     createTab();
     installTabSwitchHook();
     installResetHook();
-    observeAuthenticationNote();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
