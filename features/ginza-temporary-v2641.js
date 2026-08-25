@@ -24,6 +24,7 @@
     style.textContent = `
       #tab-ginza-btn { position: relative; }
       #tab-ginza-btn::after { content: 'TEMP'; margin-left: 6px; font-size: 8px; line-height: 1; padding: 3px 5px; border-radius: 999px; background: rgba(245,158,11,.16); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+      body.simple-mode #workflow-tabs #tab-ginza-btn { display:flex !important; }
       .ginza-temp-panel { border-color: rgba(245,158,11,.28) !important; }
       .ginza-temp-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:16px; }
       .ginza-temp-note { font-size:12px; color:#9ca3af; line-height:1.55; max-width:820px; }
@@ -202,6 +203,17 @@
     window.__ginzaSwitchHookInstalled = true;
   }
 
+  function installResetHook() {
+    if (window.__ginzaResetHookInstalled || typeof window.resetAll !== 'function') return;
+    const originalReset = window.resetAll;
+    window.resetAll = function() {
+      const result = originalReset.apply(this, arguments);
+      setAllOriginal();
+      return result;
+    };
+    window.__ginzaResetHookInstalled = true;
+  }
+
   function observeAuthenticationNote() {
     const output = document.getElementById('output');
     if (!output || outputObserver) return;
@@ -214,6 +226,7 @@
     addStyles();
     createTab();
     installTabSwitchHook();
+    installResetHook();
     observeAuthenticationNote();
   }
 
