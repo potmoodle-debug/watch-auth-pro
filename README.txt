@@ -1,46 +1,61 @@
-WATCH AUTH PRO v2.67.1 — DEPLOYMENT-READY PACKAGE
+WATCH AUTH PRO v2.68.0 — 2026 REFERENCE REFRESH
 
-CURRENT UPDATE — 25 AUGUST 2026
-- v2.67.1 fixes the visible database-version banner so the header reflects the actual loaded DATABASE_META version after the older UI status code runs.
-- v2.67.0 remains the researched and cleaned missing-reference data update built on top of v2.66.1.
-- Source batch for the reference update: watch-auth-pro-missing-references-v2.65.0.csv.
-- Exact/reference-family mappings added or repaired across Omega, Cartier, Tudor, Breitling, TAG Heuer, Longines, Jaeger-LeCoultre, Grand Seiko, Seiko, IWC, Bremont, Oris, Montblanc, Hamilton, Christopher Ward, Schofield, Nivada and Swatch.
-- Collection-name-only inputs are retained as manual-review guidance instead of being treated as exact references.
-- Obvious input errors were cleaned, including Jaeger-LeCoultre 250.8.86 being mis-entered under Generic.
-- Breitling B12019 was cleaned from partial calibre text to the documented B12 / Lemania 1873 movement family.
-- Tudor 25827K is NOT silently accepted as an exact reference; it is flagged as a likely transcription error against official 25807KN Pelagos FXD Chrono / MT5813 data.
-- Tudor 2639W1A0 remains unresolved and requires manual re-checking of the engraving rather than an invented mapping.
-- TAG Heuer WAY2013 / serial WTQ5427 is retained as an authenticator replica-observation note and must be treated as a high-risk warning, not as a universal serial-only counterfeit verdict.
-- TAG Heuer WBD1423 is correctly treated as quartz; submitted “775” is not promoted to a calibre.
-- Swatch × Audemars Piguet Royal Pop is identified as a hand-wound SISTEM51 pocket-watch collaboration; submitted V8EF29 is not treated as the calibre.
-- Rolex 178240 now recognises calibre 2235 rather than returning unknown.
+CURRENT UPDATE — 8 SEPTEMBER 2026
+- Adds manufacturer-confirmed 2026 reference intelligence without replacing older historical, workshop or replica evidence.
+- TUDOR Monarch M2639W1A0U-0001 is now officially resolved to Manufacture Calibre MT5662-2U; the earlier unresolved 2639W1A0 observation is no longer left as an unknown when the full/current reference is entered.
+- Adds TUDOR Northflag M9140G1A0U-0001 / MT5652-U and Black Bay Chrono 39 M79310N-0001 / MT5813.
+- Adds current Rolex Yacht-Master II references 126680 and 126688 to the official-current catalogue layer; both use Rolex calibre 4162.
+- Adds a Rolex-only clasp-code reminder when Copy authentication note is pressed with the clasp-code field blank. The authenticator can return to enter the code or deliberately choose Copy anyway.
+- v2.67.1 and all earlier evidence layers are retained underneath this release.
 
-CORRECT FILE STRUCTURE
+DATA POLICY
+- Official-current manufacturer evidence stays separate from historical, workshop and replica-reference evidence.
+- Suspected transcription errors are not silently promoted to exact references.
+- Authentication warnings remain evidence prompts, not automatic authenticity verdicts.
+
+CORE FILE STRUCTURE
 
 index.html
 styles.css
 app.js
 .nojekyll
+README.md
+README.txt
+DEPLOYMENT_CHECKLIST.txt
 data/
   watch-reference-data.js
-  watch-reference-data-v267.js
-  watch-reference-data-v265.js
+  watch-reference-data-base-v253.js
+  watch-reference-data-v254.js
+  watch-reference-data-v255.js
   watch-reference-data-v262.js
+  watch-reference-data-v265.js
+  watch-reference-data-v267.js
+  watch-reference-data-v268.js
   rolex-current-catalogue-v261.js
+  rolex-current-catalogue-v268.js
 features/
-  version-banner-v2671.js
+  calibre-suggest-v256.js
+  custom-brand-v257.js
+  save-next-scroll-v258.js
+  iwc-tools-brand-order-v259.js
+  tudor-serial-compact-v2591.js
+  rma-returns-v260.js
+  rma-note-only-v2601.js
+  rma-inspection-wording-v2602.js
+  rma-no-timekeeping-v2603.js
+  omega-speedmaster-dating-v2604.js
+  missing-reference-all-brands-v2605.js
   rolex-current-catalogue-v261.js
   rma-return-condition-v263.js
   compact-watch-information-v264.js
+  version-banner-v2671.js
+  tag-calibre-11-reminder-v2651.js
+  ginza-temporary-v2641.js
+  rolex-clasp-copy-reminder-v268.js
 
-IMPORTANT
-1. GitHub Pages should deploy from main, /(root).
-2. data/watch-reference-data.js is the loader and now identifies v2.67.1.
-3. v2.67.1 is a display-layer bugfix; the researched reference data remains the v2.67.0 layer.
-4. Do not remove the older data layers; the update is additive and intentionally sits on top of v2.66.1 and earlier reference layers.
-
-VERIFIED EXISTING FEATURES RETAINED
-- Official current Rolex catalogue data remains separate from vintage, movement and replica-reference evidence.
-- RMA quick-add includes “Watch returned in same condition as shipped to buyer.”
-- Reference, serial, calibre, dating, catalogue and clasp results remain consolidated into the concise click-to-open Watch information panel.
-- The closed panel retains visible Attention or Review status while detailed output remains available on click.
+DEPLOYMENT
+1. GitHub Pages deploys from main, /(root).
+2. data/watch-reference-data.js is the additive loader and identifies v2.68.0.
+3. Do not remove older data layers; later releases intentionally sit on top of earlier evidence.
+4. Current Rolex catalogue refreshes must remain in separate rolex-current-catalogue layers.
+5. Before merging, verify the loader references every required file and test Rolex note copying both with and without a clasp code.
