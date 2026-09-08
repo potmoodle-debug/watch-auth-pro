@@ -1,11 +1,44 @@
-BEFORE COMMITTING, GITHUB MUST SHOW:
+WATCH AUTH PRO — PRE-MERGE CHECKLIST
 
+CORE
 [ ] index.html
 [ ] styles.css
 [ ] app.js
 [ ] .nojekyll
+[ ] README.md
 [ ] README.txt
 [ ] DEPLOYMENT_CHECKLIST.txt
 [ ] data/watch-reference-data.js
 
-Do not commit if watch-reference-data.js appears at the repository root.
+V2.68 ADDITIVE LAYERS
+[ ] data/watch-reference-data-v268.js
+[ ] data/rolex-current-catalogue-v268.js
+[ ] features/rolex-clasp-copy-reminder-v268.js
+
+RETAINED REQUIRED LAYERS
+[ ] data/watch-reference-data-base-v253.js
+[ ] data/watch-reference-data-v254.js
+[ ] data/watch-reference-data-v255.js
+[ ] data/watch-reference-data-v262.js
+[ ] data/watch-reference-data-v265.js
+[ ] data/watch-reference-data-v267.js
+[ ] data/rolex-current-catalogue-v261.js
+[ ] features/rolex-current-catalogue-v261.js
+[ ] features/version-banner-v2671.js
+[ ] features/tag-calibre-11-reminder-v2651.js
+[ ] features/ginza-temporary-v2641.js
+
+FUNCTIONAL SMOKE TESTS
+[ ] Header/database banner reports v2.68.0
+[ ] Tudor Monarch M2639W1A0U-0001 resolves to MT5662-2U
+[ ] Tudor Northflag M9140G1A0U-0001 resolves to MT5652-U
+[ ] Tudor Black Bay Chrono 39 M79310N-0001 resolves to MT5813
+[ ] Rolex 126680 returns Yacht-Master II current-catalogue guidance
+[ ] Rolex 126688 returns Yacht-Master II current-catalogue guidance
+[ ] Rolex + blank clasp + Copy authentication note shows clasp reminder
+[ ] Enter clasp code returns focus to clasp field and does not copy
+[ ] Copy anyway copies the note
+[ ] Non-Rolex note copy is unaffected
+
+Do not commit if watch-reference-data.js appears at repository root.
+Do not remove older evidence layers unless a deliberate migration has been tested.
