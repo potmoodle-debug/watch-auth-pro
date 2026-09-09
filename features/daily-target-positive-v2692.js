@@ -1,6 +1,6 @@
 /* Watch Auth Pro — neutral daily target projection
-   Version 2.69.3 — 9 September 2026
-   Presents pace as a factual projection rather than praise or criticism.
+   Version 2.69.5 — 9 September 2026
+   Factual projection with lightweight timed refresh only.
 */
 (() => {
   const WORK_WINDOWS = [
@@ -19,6 +19,10 @@
     }, 0);
   }
 
+  function setTextIfChanged(element, value) {
+    if (element && element.textContent !== value) element.textContent = value;
+  }
+
   function refreshMain() {
     const pace = document.getElementById('daily-target-pace');
     const remaining = document.getElementById('daily-target-remaining');
@@ -31,30 +35,23 @@
     const minuteOfDay = now.getHours() * 60 + now.getMinutes();
     const elapsed = elapsedWorkMinutes(now);
 
-    remaining.textContent = `${percentage}% complete`;
+    setTextIfChanged(remaining, `${percentage}% complete`);
 
+    let label;
     if (completed >= target) {
-      pace.textContent = `Completed: ${completed} / ${target}`;
-      pace.className = 'daily-target-pace ahead';
-      return;
+      label = `Completed: ${completed} / ${target}`;
+    } else if (minuteOfDay < WORK_WINDOWS[0][0] || elapsed < 30) {
+      label = `Target: ${target}`;
+    } else if (minuteOfDay >= WORK_WINDOWS[WORK_WINDOWS.length - 1][1]) {
+      label = `Finished: ${completed} / ${target}`;
+    } else {
+      const fraction = elapsed / TOTAL_WORK_MINUTES;
+      const projected = Math.max(completed, Math.round(completed / fraction));
+      label = `Projected: ${projected} / ${target}`;
     }
 
-    if (minuteOfDay < WORK_WINDOWS[0][0] || elapsed < 30) {
-      pace.textContent = `Target: ${target}`;
-      pace.className = 'daily-target-pace neutral';
-      return;
-    }
-
-    if (minuteOfDay >= WORK_WINDOWS[WORK_WINDOWS.length - 1][1]) {
-      pace.textContent = `Finished: ${completed} / ${target}`;
-      pace.className = 'daily-target-pace neutral';
-      return;
-    }
-
-    const fraction = elapsed / TOTAL_WORK_MINUTES;
-    const projected = Math.max(completed, Math.round(completed / fraction));
-    pace.textContent = `Projected: ${projected} / ${target}`;
-    pace.className = 'daily-target-pace neutral';
+    setTextIfChanged(pace, label);
+    if (pace.className !== 'daily-target-pace neutral') pace.className = 'daily-target-pace neutral';
   }
 
   function syncSimple() {
@@ -62,10 +59,10 @@
     const mainPace = document.getElementById('daily-target-pace');
     const simpleRemaining = document.getElementById('simple-daily-target-remaining');
     const simplePace = document.getElementById('simple-daily-target-pace');
-    if (mainRemaining && simpleRemaining) simpleRemaining.textContent = mainRemaining.textContent;
+    if (mainRemaining && simpleRemaining) setTextIfChanged(simpleRemaining, mainRemaining.textContent);
     if (mainPace && simplePace) {
-      simplePace.textContent = mainPace.textContent;
-      simplePace.className = 'simple-daily-target-pace neutral';
+      setTextIfChanged(simplePace, mainPace.textContent);
+      if (simplePace.className !== 'simple-daily-target-pace neutral') simplePace.className = 'simple-daily-target-pace neutral';
     }
   }
 
@@ -76,9 +73,8 @@
 
   function initialise() {
     refresh();
-    const observer = new MutationObserver(refresh);
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-    setInterval(refresh, 30000);
+    document.getElementById('daily-target-input')?.addEventListener('change', () => setTimeout(refresh, 0));
+    setInterval(refresh, 5000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialise, { once: true });
