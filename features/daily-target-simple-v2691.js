@@ -1,6 +1,6 @@
 /* Watch Auth Pro — Simple-mode daily target mirror
-   Version 2.69.4 — 9 September 2026
-   Standalone Simple-mode card; visibility follows the Simple banner rather than being nested inside it.
+   Version 2.69.5 — 9 September 2026
+   Lightweight standalone Simple-mode card with no self-triggering DOM observer.
 */
 (() => {
   const CARD_ID = 'simple-daily-target-card';
@@ -77,12 +77,18 @@
     return card;
   }
 
+  function setTextIfChanged(id, value) {
+    const element = document.getElementById(id);
+    if (element && element.textContent !== value) element.textContent = value;
+  }
+
   function syncFromMain() {
     const simpleCard = createCard();
     if (!simpleCard) return;
 
-    simpleCard.hidden = !simpleModeIsVisible();
-    if (simpleCard.hidden) return;
+    const shouldShow = simpleModeIsVisible();
+    if (simpleCard.hidden === shouldShow) simpleCard.hidden = !shouldShow;
+    if (!shouldShow) return;
 
     const completed = document.getElementById('daily-target-completed')?.textContent || '0';
     const ofText = document.getElementById('daily-target-of')?.textContent || '/ 50';
@@ -91,12 +97,18 @@
     const mainInput = document.getElementById('daily-target-input');
     const fill = document.getElementById('daily-target-fill');
 
-    document.getElementById('simple-daily-target-count').textContent = completed;
-    document.getElementById('simple-daily-target-of').textContent = ofText;
-    document.getElementById('simple-daily-target-remaining').textContent = remaining;
-    document.getElementById('simple-daily-target-pace').textContent = pace;
-    document.getElementById('simple-daily-target-input').value = mainInput?.value || '50';
-    document.getElementById('simple-daily-target-fill').style.width = fill?.style?.width || '0%';
+    setTextIfChanged('simple-daily-target-count', completed);
+    setTextIfChanged('simple-daily-target-of', ofText);
+    setTextIfChanged('simple-daily-target-remaining', remaining);
+    setTextIfChanged('simple-daily-target-pace', pace);
+
+    const simpleInput = document.getElementById('simple-daily-target-input');
+    const nextInputValue = mainInput?.value || '50';
+    if (simpleInput && simpleInput.value !== nextInputValue) simpleInput.value = nextInputValue;
+
+    const simpleFill = document.getElementById('simple-daily-target-fill');
+    const nextWidth = fill?.style?.width || '0%';
+    if (simpleFill && simpleFill.style.width !== nextWidth) simpleFill.style.width = nextWidth;
   }
 
   function initialise() {
@@ -104,15 +116,10 @@
     createCard();
     syncFromMain();
 
-    const observer = new MutationObserver(syncFromMain);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ['class','style','hidden','value']
-    });
-    setInterval(syncFromMain, 10000);
+    document.getElementById('simple-mode-btn')?.addEventListener('click', () => setTimeout(syncFromMain, 0));
+    document.getElementById('advanced-mode-btn')?.addEventListener('click', () => setTimeout(syncFromMain, 0));
+    document.getElementById('daily-target-input')?.addEventListener('change', () => setTimeout(syncFromMain, 0));
+    setInterval(syncFromMain, 5000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialise, { once: true });
