@@ -3,7 +3,7 @@
 
   const featureFiles = [
     'features/movement-technology-reminder-core-v2651.js',
-    'features/daily-work-dashboard-v2690.js'
+    'features/daily-work-dashboard-compact-v2693.js'
   ];
 
   featureFiles.forEach(src => {
