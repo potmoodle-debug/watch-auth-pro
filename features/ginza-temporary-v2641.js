@@ -41,7 +41,28 @@
       .ginza-temp-summary { margin-top:16px; padding:14px 16px; border-radius:12px; border:1px solid rgba(59,130,246,.25); background:rgba(37,99,235,.07); }
       .ginza-temp-summary-title { font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:900; color:#60a5fa; margin-bottom:6px; }
       .ginza-temp-summary-text { font-size:13px; line-height:1.65; color:#d1d5db; white-space:pre-line; }
-      .rolex-inline-clasp { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(59,130,246,.2); }
+      .rolex-inline-clasp {
+        margin-top: 14px;
+        padding: 14px;
+        border: 1px solid rgba(16,185,129,.55);
+        border-left: 4px solid #34d399;
+        border-radius: 12px;
+        background: linear-gradient(135deg, rgba(6,78,59,.34), rgba(16,185,129,.08));
+        box-shadow: 0 0 0 1px rgba(52,211,153,.08), 0 8px 24px rgba(0,0,0,.18);
+      }
+      .rolex-inline-clasp .field-label > span:first-child { color:#6ee7b7; font-weight:900; letter-spacing:.02em; }
+      .rolex-inline-clasp .field-help { color:#a7f3d0; }
+      .rolex-inline-clasp #claspCode {
+        border-color: rgba(52,211,153,.72) !important;
+        background: rgba(2,44,34,.72) !important;
+        color:#ecfdf5 !important;
+        box-shadow: inset 0 0 0 1px rgba(52,211,153,.08);
+      }
+      .rolex-inline-clasp #claspCode:focus {
+        border-color:#6ee7b7 !important;
+        box-shadow: 0 0 0 3px rgba(52,211,153,.16) !important;
+      }
+      .rolex-inline-clasp #claspCode::placeholder { color:#6b9f8d; }
       @media (max-width: 900px) {
         .ginza-temp-row { grid-template-columns:1fr 1fr; }
         .ginza-temp-component { grid-column:1 / -1; margin-bottom:2px; }
@@ -121,10 +142,6 @@
     el.textContent = text || 'No Ginza component changes recorded. All components are set to Original.';
   }
 
-  // Feed Ginza differences into the app's existing Detailed Comments field.
-  // The normal Watch Auth Pro note generator already includes that field, so this
-  // keeps Ginza changes inside the real Authentication Note instead of merely
-  // drawing extra text inside the preview DOM.
   function applyToAuthenticationNote() {
     const comments = document.getElementById('comments');
     if (!comments) return;
@@ -145,11 +162,9 @@
     comments.value = value;
     lastGeneratedNote = next;
 
-    // Trigger the application's normal live-note regeneration.
     comments.dispatchEvent(new Event('input', { bubbles: true }));
     comments.dispatchEvent(new Event('change', { bubbles: true }));
 
-    // Fallback for builds where the comments listener is not input-driven.
     if (typeof window.updateScore === 'function') window.updateScore();
   }
 
