@@ -16,6 +16,10 @@
   const OPTIONS = ['Original', 'Replica', 'Generic', 'Customized'];
   const state = Object.fromEntries(COMPONENTS.map(([key]) => [key, 'Original']));
   let lastGeneratedNote = '';
+  let claspField = null;
+  let claspZone = null;
+  let claspOriginalParent = null;
+  let claspOriginalNextSibling = null;
 
   function addStyles() {
     if (document.getElementById('ginza-temp-styles')) return;
@@ -37,12 +41,58 @@
       .ginza-temp-summary { margin-top:16px; padding:14px 16px; border-radius:12px; border:1px solid rgba(59,130,246,.25); background:rgba(37,99,235,.07); }
       .ginza-temp-summary-title { font-size:10px; text-transform:uppercase; letter-spacing:.14em; font-weight:900; color:#60a5fa; margin-bottom:6px; }
       .ginza-temp-summary-text { font-size:13px; line-height:1.65; color:#d1d5db; white-space:pre-line; }
+      .rolex-inline-clasp { margin-top: 14px; padding-top: 14px; border-top: 1px solid rgba(59,130,246,.2); }
       @media (max-width: 900px) {
         .ginza-temp-row { grid-template-columns:1fr 1fr; }
         .ginza-temp-component { grid-column:1 / -1; margin-bottom:2px; }
       }
     `;
     document.head.appendChild(style);
+  }
+
+  function selectedBrand() {
+    return document.querySelector('.brand-checkbox:checked')?.value || 'Generic';
+  }
+
+  function positionRolexClasp() {
+    const claspInput = document.getElementById('claspCode');
+    const serialInput = document.getElementById('serialInput');
+    if (!claspInput || !serialInput) return;
+
+    if (!claspField) {
+      claspField = claspInput.closest('.field');
+      claspZone = claspField?.closest('.data-zone');
+      claspOriginalParent = claspField?.parentNode || null;
+      claspOriginalNextSibling = claspField?.nextSibling || null;
+    }
+    if (!claspField || !claspZone || !claspOriginalParent) return;
+
+    const serialField = serialInput.closest('.field');
+    if (!serialField) return;
+
+    if (selectedBrand() === 'Rolex') {
+      if (claspField.parentNode !== serialField) serialField.appendChild(claspField);
+      claspField.classList.add('rolex-inline-clasp');
+      claspZone.classList.add('hidden');
+    } else {
+      claspField.classList.remove('rolex-inline-clasp');
+      if (claspField.parentNode !== claspOriginalParent) {
+        if (claspOriginalNextSibling && claspOriginalNextSibling.parentNode === claspOriginalParent) {
+          claspOriginalParent.insertBefore(claspField, claspOriginalNextSibling);
+        } else {
+          claspOriginalParent.appendChild(claspField);
+        }
+      }
+      claspZone.classList.remove('hidden');
+    }
+  }
+
+  function installRolexClaspLayout() {
+    positionRolexClasp();
+    const brandGrid = document.getElementById('brandGrid');
+    if (!brandGrid || brandGrid.dataset.rolexClaspLayoutBound === 'true') return;
+    brandGrid.dataset.rolexClaspLayoutBound = 'true';
+    brandGrid.addEventListener('change', () => setTimeout(positionRolexClasp, 0));
   }
 
   function buildRows() {
@@ -61,8 +111,7 @@
     const changes = COMPONENTS
       .map(([key, label]) => state[key] !== 'Original' ? `${label}: ${state[key]}` : null)
       .filter(Boolean);
-    return changes.length ? `Component changes:
-${changes.map(change => `• ${change}`).join('\n')}` : '';
+    return changes.length ? `Component changes:\n${changes.map(change => `• ${change}`).join('\n')}` : '';
   }
 
   function updateSummary() {
@@ -224,6 +273,7 @@ ${changes.map(change => `• ${change}`).join('\n')}` : '';
       COMPONENTS.forEach(([key]) => { state[key] = 'Original'; });
       document.querySelectorAll('#tab-ginza-content input[type="radio"][value="Original"]').forEach(input => { input.checked = true; });
       updateSummary();
+      setTimeout(positionRolexClasp, 0);
       return result;
     };
     window.__ginzaResetHookInstalled = true;
@@ -231,6 +281,7 @@ ${changes.map(change => `• ${change}`).join('\n')}` : '';
 
   function init() {
     addStyles();
+    installRolexClaspLayout();
     createTab();
     installTabSwitchHook();
     installResetHook();
