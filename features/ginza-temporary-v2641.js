@@ -305,3 +305,68 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
 })();
+
+/* v2.73.1 stale-loader recovery.
+   index.html historically referenced data/watch-reference-data.js without a cache-busting query.
+   If a browser restores an older loader, force-fetch the current loader once and refresh the banner. */
+(() => {
+  'use strict';
+  const TARGET_VERSION = '2.73.0';
+  const TARGET_UPDATED = '15 September 2026';
+  const RECOVERY_KEY = 'wap_loader_recovery_2730';
+
+  function versionParts(v) {
+    return String(v || '0').split('.').map(x => parseInt(x, 10) || 0);
+  }
+  function olderThan(a, b) {
+    const aa = versionParts(a), bb = versionParts(b);
+    for (let i = 0; i < Math.max(aa.length, bb.length); i++) {
+      const av = aa[i] || 0, bv = bb[i] || 0;
+      if (av !== bv) return av < bv;
+    }
+    return false;
+  }
+  function setBanner(version, updated) {
+    const status = document.getElementById('database-status');
+    if (status) status.textContent = `DB v${version} • UPDATED ${String(updated || '').toUpperCase()}`;
+  }
+  function currentVersion() {
+    try { return typeof DATABASE_META !== 'undefined' && DATABASE_META ? DATABASE_META.version : ''; }
+    catch (e) { return ''; }
+  }
+  function currentUpdated() {
+    try { return typeof DATABASE_META !== 'undefined' && DATABASE_META ? DATABASE_META.updated : ''; }
+    catch (e) { return ''; }
+  }
+
+  function recoverIfStale() {
+    const version = currentVersion();
+    if (version && !olderThan(version, TARGET_VERSION)) {
+      setBanner(version, currentUpdated() || TARGET_UPDATED);
+      return;
+    }
+
+    let alreadyTried = false;
+    try { alreadyTried = sessionStorage.getItem(RECOVERY_KEY) === '1'; } catch (e) {}
+    if (alreadyTried) return;
+    try { sessionStorage.setItem(RECOVERY_KEY, '1'); } catch (e) {}
+
+    const script = document.createElement('script');
+    script.src = `data/watch-reference-data.js?v=2730-recovery-${Date.now()}`;
+    script.onload = () => {
+      setTimeout(() => {
+        const v = currentVersion() || TARGET_VERSION;
+        const d = currentUpdated() || TARGET_UPDATED;
+        setBanner(v, d);
+        if (typeof updateDatabaseStatus === 'function') {
+          try { updateDatabaseStatus(); } catch (e) {}
+          setBanner(currentVersion() || v, currentUpdated() || d);
+        }
+      }, 0);
+    };
+    document.head.appendChild(script);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', recoverIfStale, { once: true });
+  else recoverIfStale();
+})();
