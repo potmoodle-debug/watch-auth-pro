@@ -1,0 +1,87 @@
+/* Watch Auth Pro researched merge + lookup compatibility
+   Version 2.72.0 — 15 September 2026
+   Source: remaining 90-entry research pass; 48 MERGE-classified rows.
+*/
+(function(){
+  function addMany(target, rows){ if(Array.isArray(target)) rows.slice().reverse().forEach(r=>target.unshift(r)); }
+
+  addMany(OMEGA_REFERENCE_RULES,[
+    {refs:["215.90.44.21.99.001","21590442199001"],family:"Seamaster Planet Ocean 600M",size:"43.5 mm",calibre:["8900"],calibreDisplay:"8900",technology:"Automatic Co-Axial Master Chronometer",reserve:"60 hours",notes:"43.5 mm titanium; 600 m; 60 h",source:"OMEGA official product page",confidence:"Official / High"},
+    {refs:["311.93.44.51.99.002","31193445199002"],family:"Speedmaster Grey Side of the Moon",size:"44.25 mm",calibre:["9300"],calibreDisplay:"9300",technology:"Automatic Co-Axial chronograph",reserve:"60 hours",notes:"44.25 mm ceramic; 50 m; 60 h",source:"OMEGA user manual / product records",confidence:"Official / High"},
+    {refs:["2250.80","225080"],family:"Seamaster Professional Diver 300M",size:"reference-specific",calibre:["1120"],calibreDisplay:"1120",technology:"Automatic chronometer",reserve:"reference-specific",notes:"Blue dial; 300 m; date",source:"OMEGA/reference records",confidence:"Medium-High"},
+    {refs:["311.92.44.30.01.001","31192443001001"],family:"Speedmaster Dark Side of the Moon Apollo 8",size:"44.25 mm",calibre:["1869"],calibreDisplay:"1869",technology:"Manual-wind chronograph",reserve:"reference-specific",notes:"44.25 mm ceramic; 50 m",source:"OMEGA/reference records",confidence:"High"},
+    {refs:["2254.50","225450"],family:"Seamaster Diver 300M Professional",size:"41 mm",calibre:["1120"],calibreDisplay:"1120",technology:"Automatic chronometer",reserve:"reference-specific",notes:"41 mm; 300 m; black dial; date",source:"OMEGA/reference records",confidence:"High"},
+    {refs:["213.30.42.40.01.001","21330424001001"],family:"Seamaster Diver 300M Chronograph",size:"41.5 mm",calibre:["1164"],calibreDisplay:"1164",technology:"Automatic chronograph chronometer",reserve:"44 hours",notes:"41.5 mm; 300 m; 44 h",source:"OMEGA official product sheet",confidence:"Official / High"},
+    {refs:["210.904.220.010.01","21090422001001"],family:"Seamaster Diver 300M 007 Edition / No Time To Die",size:"reference-specific",calibre:["8806"],calibreDisplay:"8806",technology:"Automatic Co-Axial Master Chronometer",reserve:"reference-specific",notes:"Malformed workshop entry normalised to 210.90.42.20.01.001",source:"OMEGA/reference records",confidence:"High"}
+  ]);
+
+  addMany(CARTIER_REFERENCE_RULES,[
+    {pattern:/^W20011C4$/i,baseReference:"W20011C4",family:"Santos Galbée",size:"41 mm",calibre:["687"],calibreDisplay:"687",technology:"Quartz",reserve:"reference-specific",notes:"approx. 29 x 41 mm; date",source:"Cartier market/reference records",confidence:"High"},
+    {pattern:/^W20072X7$/i,baseReference:"W20072X7",family:"Santos 100",size:"reference-specific",calibre:["049"],calibreDisplay:"049",technology:"Automatic",reserve:"reference-specific",notes:"Large Santos 100 family",source:"Cartier/reference records",confidence:"High"},
+    {pattern:/^WB701851$/i,baseReference:"WB701851",family:"Tank Américaine",size:"reference-specific",calibre:["157"],calibreDisplay:"157",technology:"Quartz",reserve:"reference-specific",notes:"White-gold Tank Américaine family",source:"Cartier/reference records",confidence:"Medium-High"},
+    {pattern:/^W20073X8$/i,baseReference:"W20073X8",family:"Santos 100",size:"reference-specific",calibre:["049"],calibreDisplay:"049",technology:"Automatic",reserve:"reference-specific",notes:"Santos 100 family",source:"Cartier/reference records",confidence:"High"}
+  ]);
+
+  addMany(TUDOR_REFERENCE_RULES,[
+    {pattern:/^79733$/i,baseReference:"79733",family:"Black Bay S&G",size:"41 mm",calibre:["MT5612"],calibreDisplay:"MT5612",technology:"Automatic manufacture calibre",reserve:"reference-specific",notes:"41 mm; steel/yellow gold; 200 m",source:"Tudor/market reference records",confidence:"High"},
+    {pattern:/^79012$/i,baseReference:"79012",family:"Black Bay Fifty-Eight Bronze",size:"39 mm",calibre:["MT5400"],calibreDisplay:"MT5400",technology:"Automatic manufacture calibre",reserve:"70 hours",notes:"39 mm bronze; 200 m; 70 h",source:"Tudor/reference records",confidence:"High"},
+    {pattern:/^25610T$/i,baseReference:"25610T",family:"Pelagos LHD",size:"42 mm",calibre:["MT5612-LHD"],calibreDisplay:"MT5612-LHD",technology:"Automatic manufacture calibre",reserve:"reference-specific",notes:"42 mm titanium; left-hand crown; date",source:"Sotheby's / Tudor records",confidence:"High"}
+  ]);
+
+  addMany(OTHER_REFERENCE_RULES,[
+    {brand:"IWC",pattern:/^IW370703$/i,baseReference:"IW370703",family:"GST Chronograph Titanium",size:"40 mm",calibre:["7922"],calibreDisplay:"7922",technology:"Automatic chronograph",reserve:"reference-specific",notes:"40 mm titanium; 100 m; chronograph/day/date",source:"Chrono24 cross-reference; IWC GST reference records",confidence:"High"},
+    {brand:"AWAKE",pattern:/^JURASSICWATCHRAPTORS$/i,baseReference:"Jurassic Watch RAPTORS",family:"Jurassic Watch RAPTORS Edition",size:"39 mm",calibre:["La Joux-Perret G101"],calibreDisplay:"La Joux-Perret G101",technology:"Automatic",reserve:"68 hours",notes:"39 mm; 50 m; 68 h; limited edition 50",source:"AWAKE official product page",confidence:"Official / High"},
+    {brand:"Breitling",pattern:/^A17316$/i,baseReference:"A17316",family:"Superocean Automatic 36",size:"36 mm",calibre:["Breitling 17"],calibreDisplay:"Breitling 17",technology:"Automatic",reserve:"reference-specific",notes:"36 mm; 200 m; date",source:"Breitling-family decoding + auction/reference records",confidence:"High"},
+    {brand:"M.A.D",pattern:/^M\.A\.D\.2$/i,baseReference:"M.A.D. 2",family:"M.A.D.2",size:"42 mm",calibre:["La Joux-Perret G101 + MB&F jumping-hour module","La Joux-Perret G101","MB&F jumping-hour module"],calibreDisplay:"La Joux-Perret G101 + MB&F jumping-hour module",technology:"Automatic",reserve:"64 hours",notes:"42 mm; 30 m; 64 h",source:"MB&F official M.A.D.2 page",confidence:"Official / High"},
+    {brand:"Bremont",pattern:/^SUPERMARINES300$/i,baseReference:"Supermarine S300",family:"Supermarine S300",size:"40 mm",calibre:["BE-92AE / modified ETA 2892-family","BE-92AE","modified ETA 2892-family"],calibreDisplay:"BE-92AE / modified ETA 2892-family",technology:"Automatic chronometer",reserve:"reference-specific",notes:"40 mm; 300 m; date",source:"Bremont S300 reference records",confidence:"Medium-High"},
+    {brand:"DAMASKO",pattern:/^DC66$/i,baseReference:"DC66",family:"DC66",size:"reference-specific",calibre:["Valjoux 7750 TOP"],calibreDisplay:"Valjoux 7750 TOP",technology:"Automatic chronograph",reserve:"52 hours",notes:"52 h; day/date; rotating bezel",source:"DAMASKO official product page",confidence:"Official / High"},
+    {brand:"Grand Seiko",pattern:/^SLGA007G$/i,baseReference:"SLGA007G",family:"Heritage Collection Lake Suwa Limited Edition",size:"40 mm",calibre:["9RA2"],calibreDisplay:"9RA2",technology:"Spring Drive automatic",reserve:"120 hours",notes:"40 mm; 100 m; 120 h; limited edition",source:"Grand Seiko reference records",confidence:"High"},
+    {brand:"Longines",pattern:/^L2\.773\.4$/i,baseReference:"L2.773.4",family:"Master Collection Chronograph Moonphase family",size:"reference-specific",calibre:["L687.5"],calibreDisplay:"L687.5",technology:"Automatic chronograph",reserve:"reference-specific",notes:"Reference stem; full suffix required for exact dial/strap configuration",source:"Longines reference records",confidence:"Medium-High"},
+    {brand:"Breitling",pattern:/^A13320$/i,baseReference:"A13320",family:"Superocean Heritage Chronograph",size:"46 mm",calibre:["Breitling 13"],calibreDisplay:"Breitling 13",technology:"Automatic chronograph",reserve:"reference-specific",notes:"46 mm; 200 m; chronograph/date",source:"Breitling/reference records",confidence:"High"},
+    {brand:"Seiko",pattern:/^SSJ039J1$/i,baseReference:"SSJ039J1",family:"Astron GPS Solar 2026 Limited Edition",size:"41.2 mm",calibre:["3X62"],calibreDisplay:"3X62",technology:"GPS Solar",reserve:"reference-specific",notes:"41.2 mm titanium; 100 m; 6 months; LE 1,500",source:"Seiko official product page",confidence:"Official / High"},
+    {brand:"Grand Seiko",pattern:/^SBGA429$/i,baseReference:"SBGA429",family:"Heritage Collection Soko Shadow",size:"39 mm",calibre:["9R65"],calibreDisplay:"9R65",technology:"Spring Drive automatic",reserve:"72 hours",notes:"39 mm; 100 m; 72 h; date/power reserve",source:"Grand Seiko official page",confidence:"Official / High"},
+    {brand:"Longines",pattern:/^L3\.410\.4$/i,baseReference:"L3.410.4",family:"Spirit 40 mm family",size:"40 mm",calibre:["L888.4"],calibreDisplay:"L888.4",technology:"Automatic COSC",reserve:"72 hours",notes:"40 mm; 100 m; 72 h; date",source:"Longines/reference records",confidence:"Medium-High"},
+    {brand:"Maurice Lacroix",pattern:/^AI6007$/i,baseReference:"AI6007",family:"AIKON Automatic / Skeleton 39 mm family",size:"39 mm",calibre:["ML115"],calibreDisplay:"ML115",technology:"Automatic",reserve:"reference-specific",notes:"39 mm family; exact suffix determines configuration",source:"Maurice Lacroix / Phillips records",confidence:"High"},
+    {brand:"Hublot",pattern:/^511\.NX\.1170\.RX$/i,baseReference:"511.NX.1170.RX",family:"Classic Fusion 45 mm",size:"45 mm",calibre:["HUB1112"],calibreDisplay:"HUB1112",technology:"Automatic",reserve:"reference-specific",notes:"45 mm titanium; rubber strap",source:"Hublot/reference records",confidence:"High"},
+    {brand:"TAG Heuer",pattern:/^WAY201B$/i,baseReference:"WAY201B",family:"Aquaracer 300M Calibre 5",size:"43 mm",calibre:["Calibre 5"],calibreDisplay:"Calibre 5",technology:"Automatic",reserve:"reference-specific",notes:"43 mm; 300 m; date",source:"TAG Heuer/reference records",confidence:"High"},
+    {brand:"Breitling",pattern:/^A17376$/i,baseReference:"A17376",family:"Superocean Automatic 44",size:"44 mm",calibre:["Breitling 17"],calibreDisplay:"Breitling 17",technology:"Automatic",reserve:"reference-specific",notes:"44 mm; date",source:"Breitling/reference records",confidence:"High"},
+    {brand:"Breitling",pattern:/^A59028$/i,baseReference:"A59028",family:"Jupiter Pilot",size:"reference-specific",calibre:["Breitling 59 / Miyota 3510 base","Breitling 59","Miyota 3510 base"],calibreDisplay:"Breitling 59 / Miyota 3510 base",technology:"Quartz chronograph",reserve:"reference-specific",notes:"1990s Jupiter Pilot family",source:"Breitling specialist reference records",confidence:"High"},
+    {brand:"Panerai",pattern:/^PAM01305$/i,baseReference:"PAM01305",family:"Luminor Submersible 1950 3 Days / Submersible 47 Titanium",size:"47 mm",calibre:["P.9010"],calibreDisplay:"P.9010",technology:"Automatic",reserve:"72 hours",notes:"47 mm titanium; 300 m; 72 h",source:"Panerai/reference records",confidence:"High"},
+    {brand:"TAG Heuer",pattern:/^CAZ101AP$/i,baseReference:"CAZ101AP",family:"Formula 1 Quartz Chronograph",size:"43 mm",calibre:["Ronda 5040.D / TAG quartz chronograph","Ronda 5040.D","TAG quartz chronograph"],calibreDisplay:"Ronda 5040.D / TAG quartz chronograph",technology:"Quartz chronograph",reserve:"reference-specific",notes:"43 mm; 200 m; date",source:"TAG Heuer/reference records",confidence:"Medium-High"},
+    {brand:"TAG Heuer",pattern:/^WBD1420$/i,baseReference:"WBD1420",family:"Aquaracer Date 27 mm",size:"27 mm",calibre:["Quartz"],calibreDisplay:"Quartz",technology:"Quartz",reserve:"reference-specific",notes:"27 mm; 300 m; date",source:"TAG Heuer official product page",confidence:"Official / High"},
+    {brand:"Breitling",pattern:/^A44364$/i,baseReference:"A44364",family:"Bentley 6.75",size:"49 mm",calibre:["44B"],calibreDisplay:"44B",technology:"Automatic chronograph",reserve:"reference-specific",notes:"49 mm; 100 m; chronograph/date",source:"Breitling/reference records",confidence:"High"},
+    {brand:"TAG Heuer",pattern:/^WBP2110$/i,baseReference:"WBP2110",family:"Aquaracer Professional 200 Date",size:"40 mm",calibre:["Calibre 5"],calibreDisplay:"Calibre 5",technology:"Automatic",reserve:"38 hours",notes:"40 mm; 200 m; 38 h; date",source:"TAG Heuer official product page",confidence:"Official / High"},
+    {brand:"Seiko",pattern:/^SLA079J1$/i,baseReference:"SLA079J1",family:"Prospex Marinemaster 1968 Heritage Diver",size:"42.6 mm",calibre:["8L35"],calibreDisplay:"8L35",technology:"Automatic",reserve:"50 hours",notes:"42.6 mm; 300 m; 50 h",source:"Seiko official records",confidence:"Official / High"},
+    {brand:"TAG Heuer",pattern:/^CV2010\-1$/i,baseReference:"CV2010-1",family:"Carrera Calibre 16 Chronograph",size:"41 mm",calibre:["Calibre 16"],calibreDisplay:"Calibre 16",technology:"Automatic chronograph",reserve:"reference-specific",notes:"41 mm; tachymeter; chronograph/date",source:"TAG Heuer/reference records",confidence:"High"},
+    {brand:"Longines",pattern:/^L2\.620\.4$/i,baseReference:"L2.620.4",family:"Avigation Special Series",size:"40 mm",calibre:["L651.3"],calibreDisplay:"L651.3",technology:"Automatic chronograph",reserve:"reference-specific",notes:"40 mm; chronograph/date",source:"Longines/reference records",confidence:"High"},
+    {brand:"Seiko",pattern:/^SLA077$/i,baseReference:"SLA077",family:"Prospex Marinemaster 1968 Heritage Diver",size:"42.6 mm",calibre:["8L35"],calibreDisplay:"8L35",technology:"Automatic",reserve:"50 hours",notes:"42.6 mm; 300 m; 50 h",source:"Seiko official product page",confidence:"Official / High"},
+    {brand:"Hublot",pattern:/^542\.NX\.1171\.LR$/i,baseReference:"542.NX.1171.LR",family:"Classic Fusion 42 mm Titanium",size:"42 mm",calibre:["HUB1110 / HUB1112 family","HUB1110","HUB1112 family"],calibreDisplay:"HUB1110 / HUB1112 family",technology:"Automatic",reserve:"reference-specific",notes:"42 mm titanium; leather/rubber strap",source:"Hublot/reference records",confidence:"Medium-High"},
+    {brand:"Bremont",pattern:/^ALT1\-C\-CR$/i,baseReference:"ALT1-C-CR",family:"ALT1-C Classic Chronograph",size:"43 mm",calibre:["BE-50AE"],calibreDisplay:"BE-50AE",technology:"Automatic chronograph",reserve:"reference-specific",notes:"43 mm; chronometer; chronograph/date",source:"Bremont/reference records",confidence:"Medium-High"},
+    {brand:"anOrdain",pattern:/^ANORDAINMODEL2$/i,baseReference:"anOrdain Model 2",family:"Model 2",size:"36 mm",calibre:["Sellita SW210-1"],calibreDisplay:"Sellita SW210-1",technology:"Manual wind",reserve:"42 hours",notes:"36 mm early Model 2; approx. 42 h",source:"anOrdain / Fratello records",confidence:"High"},
+    {brand:"Seiko",pattern:/^SBEX011$/i,baseReference:"SBEX011",family:"Prospex 1968 Mechanical Diver's 55th Anniversary Limited Edition",size:"reference-specific",calibre:["8L55"],calibreDisplay:"8L55",technology:"Automatic Hi-Beat",reserve:"reference-specific",notes:"Limited edition 1,100",source:"Seiko official 55th anniversary page",confidence:"Official / High"},
+    {brand:"Hublot",pattern:/^521\.CM\.1771\.RX$/i,baseReference:"521.CM.1771.RX",family:"Classic Fusion Chronograph 45 mm",size:"45 mm",calibre:["HUB1143"],calibreDisplay:"HUB1143",technology:"Automatic chronograph",reserve:"42 hours",notes:"45 mm black ceramic; 42 h",source:"Hublot/reference retailer records",confidence:"High"},
+    {brand:"Oris",pattern:/^7759$/i,baseReference:"7759",family:"ProPilot X Calibre 115 family",size:"44 mm",calibre:["115"],calibreDisplay:"115",technology:"Manual wind",reserve:"240 hours",notes:"44 mm titanium; 10 bar; 240 h",source:"Oris official product page",confidence:"Official / High"},
+    {brand:"Bremont",pattern:/^SUPERMARINES502$/i,baseReference:"Supermarine S502",family:"Supermarine S502",size:"43 mm",calibre:["BE-932AV"],calibreDisplay:"BE-932AV",technology:"Automatic GMT chronometer",reserve:"50 hours",notes:"43 mm; 500 m; 50 h; GMT/date",source:"Bremont official product page",confidence:"Official / High"},
+    {brand:"Oris",pattern:/^778640$/i,baseReference:"7786 40",family:"Big Crown Calibre 473 family",size:"reference-specific",calibre:["473"],calibreDisplay:"473",technology:"Manual wind",reserve:"reference-specific",notes:"Normalises shorthand toward 01 473 7786 4065 family; exact suffix required",source:"Oris official product records",confidence:"High"}
+  ]);
+
+  function hydrate(rule){
+    if(!rule) return;
+    if(!rule.size) rule.size='reference-specific';
+    if(!rule.reserve) rule.reserve='reference-specific';
+    if(!rule.calibreDisplay){
+      if(Array.isArray(rule.calibre) && rule.calibre.length) rule.calibreDisplay=String(rule.calibre[0]);
+      else rule.calibreDisplay='verify movement';
+    }
+    if(!rule.technology) rule.technology='reference-specific';
+    if(!rule.notes) rule.notes='Exact reference mapping.';
+    if(!rule.source) rule.source='Watch Auth Pro researched reference records';
+    if(!rule.confidence) rule.confidence='researched mapping';
+  }
+  [OMEGA_REFERENCE_RULES,CARTIER_REFERENCE_RULES,TUDOR_REFERENCE_RULES,BREITLING_REFERENCE_RULES,OTHER_REFERENCE_RULES]
+    .forEach(list=>Array.isArray(list)&&list.forEach(hydrate));
+
+  DATABASE_META.version='2.72.0';
+  DATABASE_META.updated='15 September 2026';
+  DATABASE_META.scope='48 researched mappings reconciled from the remaining v2.65 (2) queue, plus reference lookup compatibility fixes';
+})();
