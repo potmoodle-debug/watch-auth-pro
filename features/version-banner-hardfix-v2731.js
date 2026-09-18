@@ -3,16 +3,16 @@
   function apply() {
     try {
       if (typeof DATABASE_META !== 'undefined' && DATABASE_META) {
-        DATABASE_META.version = '2.73.0';
-        DATABASE_META.updated = '15 September 2026';
+        DATABASE_META.version = '2.74.0';
+        DATABASE_META.updated = '18 September 2026';
       }
     } catch (e) {}
 
     var el = document.getElementById('database-status');
     if (!el) return;
 
-    var version = (typeof DATABASE_META !== 'undefined' && DATABASE_META && DATABASE_META.version) || '2.73.0';
-    var updated = (typeof DATABASE_META !== 'undefined' && DATABASE_META && DATABASE_META.updated) || '15 September 2026';
+    var version = (typeof DATABASE_META !== 'undefined' && DATABASE_META && DATABASE_META.version) || '2.74.0';
+    var updated = (typeof DATABASE_META !== 'undefined' && DATABASE_META && DATABASE_META.updated) || '18 September 2026';
     var desired = 'DB v' + version + ' • UPDATED ' + String(updated).toUpperCase();
 
     if (el.textContent !== desired) el.textContent = desired;
