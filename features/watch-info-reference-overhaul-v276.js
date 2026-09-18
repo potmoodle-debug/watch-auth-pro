@@ -4,6 +4,9 @@
 */
 (function(){
   'use strict';
+  let enhancing=false;
+  let scheduled=false;
+  let panelObserver=null;
 
   function clean(v){ return String(v == null ? '' : v).trim(); }
   function esc(v){ return clean(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -109,8 +112,11 @@
   }
 
   function enhance(){
-    const panel=document.getElementById('compact-watch-information');
-    if(!panel || panel.hidden) return;
+    if(enhancing) return;
+    enhancing=true;
+    try {
+      const panel=document.getElementById('compact-watch-information');
+      if(!panel || panel.hidden) return;
 
     const sections=[...panel.querySelectorAll('.watch-info-section')];
     const section=sections.find(s => /reference and model/i.test(s.querySelector('.watch-info-section-label')?.textContent || ''))
@@ -124,8 +130,20 @@
 
     const model=first(rule.family,rule.model,'Reference identified');
     const key=[brand,ref,model,calibre(rule),rule.size,rule.production,rule.era,rule.reserve,water(rule),status(rule)[0]].join('|');
-    if(section.dataset.wiRefKey===key && section.classList.contains('wi-reference-overhaul')) return;
-    build(section,rule,brand,ref);
+      if(section.dataset.wiRefKey===key && section.classList.contains('wi-reference-overhaul')) return;
+      build(section,rule,brand,ref);
+    } finally {
+      enhancing=false;
+    }
+  }
+
+  function scheduleEnhance(){
+    if(scheduled) return;
+    scheduled=true;
+    requestAnimationFrame(function(){
+      scheduled=false;
+      enhance();
+    });
   }
 
   function install(){
@@ -178,14 +196,22 @@
     }
 
     const panel=document.getElementById('compact-watch-information');
-    if(panel && typeof MutationObserver!=='undefined'){
-      const observer=new MutationObserver(()=>queueMicrotask(enhance));
-      observer.observe(panel,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['class','hidden']});
-      window.__wapWatchInfoReferenceObserver=observer;
+    const sections=panel?.querySelector('.watch-info-sections');
+    if(sections && typeof MutationObserver!=='undefined'){
+      panelObserver=new MutationObserver(function(mutations){
+        // Ignore mutations created inside the already-built quick card itself.
+        const externalChange=mutations.some(m=>{
+          const target=m.target?.nodeType===1 ? m.target : m.target?.parentElement;
+          return !target?.closest?.('.wi-reference-overhaul');
+        });
+        if(externalChange) scheduleEnhance();
+      });
+      panelObserver.observe(sections,{childList:true,subtree:true});
+      window.__wapWatchInfoReferenceObserver=panelObserver;
     }
-    ['caseRef','fullRef','movementCalibre','serialInput'].forEach(id=>document.getElementById(id)?.addEventListener('input',()=>queueMicrotask(enhance)));
-    document.querySelectorAll('.brand-checkbox').forEach(el=>el.addEventListener('change',()=>queueMicrotask(enhance)));
-    queueMicrotask(enhance);
+    ['caseRef','fullRef','movementCalibre','serialInput'].forEach(id=>document.getElementById(id)?.addEventListener('input',scheduleEnhance));
+    document.querySelectorAll('.brand-checkbox').forEach(el=>el.addEventListener('change',scheduleEnhance));
+    scheduleEnhance();
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',install,{once:true}); else install();
