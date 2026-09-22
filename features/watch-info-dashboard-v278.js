@@ -107,7 +107,7 @@
       if(aliases.some(x=>x&&(a.includes(x)||x.includes(a)))) push('Observed movement is consistent with the expected '+exp+' calibre.','success');
     }
 
-    sources.sort((a,b)=>({danger:0,warning:1,success:2,info:3}[a.tone]-({danger:0,warning:1,success:2,info:3}[b.tone]));
+    const order={danger:0,warning:1,success:2,info:3};\n    sources.sort((a,b)=>(order[a.tone]??9)-(order[b.tone]??9));
     for(const item of sources){
       for(const c of meaningfulChunks(item.el)){
         if(/source|confidence|database source/i.test(c)) continue;
