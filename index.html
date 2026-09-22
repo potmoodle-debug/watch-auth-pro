@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Watch Auth Pro v2.82.0 — Build 2824</title>
+    <title>Watch Auth Pro v2.83.0 — Build 2830</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css?v=2730">
 </head>
@@ -23,7 +23,7 @@
                 <div>
                     <div class="brand-title">Watch Auth Pro</div>
                     <div class="brand-subtitle">Internal inspection workspace</div>
-                    <div class="database-status" id="database-status" data-build="2824">DB v2.82.0 • UPDATED 22 SEPTEMBER 2026 • BUILD 2824</div>
+                    <div class="database-status" id="database-status" data-build="2830">DB v2.82.0 • UPDATED 22 SEPTEMBER 2026 • BUILD 2830</div>
                 </div>
             </div>
             <div class="status-cluster">
@@ -795,6 +795,7 @@
     <script src="data/watch-reference-data-v280.js?v=2822"></script>
     <script src="data/watch-reference-data-v281.js?v=2822"></script>
     <script src="data/watch-reference-data-v282.js?v=2822"></script>
+    <script src="data/watch-reference-data-v283.js?v=2830"></script>
 
     <script src="features/calibre-suggest-v256.js?v=2822"></script>
     <script src="features/custom-brand-v257.js?v=2822"></script>
@@ -827,9 +828,9 @@
          Reference-data version belongs to the data layer, not feature scripts.
          Legacy feature assignments are accepted syntactically but ignored. */
       if (typeof DATABASE_META !== 'undefined' && DATABASE_META) {
-        var __wapDbVersion = '2.82.0';
+        var __wapDbVersion = '2.83.0';
         var __wapDbUpdated = '22 September 2026';
-        var __wapDbScope = '106 researched reference mappings plus 18 verified production-date updates; latest verified batch: Tudor.';
+        var __wapDbScope = '106 researched reference mappings plus 22 verified production-date updates; latest verified batch: Cartier.';
         Object.defineProperty(DATABASE_META, 'version', {
           enumerable: true, configurable: true,
           get: function(){ return __wapDbVersion; },
@@ -856,7 +857,7 @@
     <script src="features/watch-info-dashboard-v278.js?v=2822"></script>
     <script>
 (function(){
-  var EXPECTED_BUILD='2824';
+  var EXPECTED_BUILD='2830';
   function stamp(){
     var el=document.getElementById('database-status');
     if(!el) return;
