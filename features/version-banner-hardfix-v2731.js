@@ -1,19 +1,15 @@
-/* Watch Auth Pro — definitive version banner fix */
+/* Watch Auth Pro — definitive version banner sync
+   Reads the live DATABASE_META value. Do not hard-code a database version here.
+*/
 (function () {
   function apply() {
-    try {
-      if (typeof DATABASE_META !== 'undefined' && DATABASE_META) {
-        DATABASE_META.version = '2.78.0';
-        DATABASE_META.updated = '22 September 2026';
-      }
-    } catch (e) {}
-
     var el = document.getElementById('database-status');
     if (!el) return;
 
-    var version = (typeof DATABASE_META !== 'undefined' && DATABASE_META && DATABASE_META.version) || '2.78.0';
-    var updated = (typeof DATABASE_META !== 'undefined' && DATABASE_META && DATABASE_META.updated) || '22 September 2026';
-    var desired = 'DB v' + version + ' • UPDATED ' + String(updated).toUpperCase();
+    var meta = (typeof DATABASE_META !== 'undefined' && DATABASE_META) ? DATABASE_META : {};
+    var version = meta.version || 'loading';
+    var updated = meta.updated || '';
+    var desired = 'DB v' + version + (updated ? ' • UPDATED ' + String(updated).toUpperCase() : '');
 
     if (el.textContent !== desired) el.textContent = desired;
   }
