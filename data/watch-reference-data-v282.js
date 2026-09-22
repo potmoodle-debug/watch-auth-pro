@@ -42,4 +42,9 @@
   apply('79470','2022–present','TUDOR official Black Bay Pro 2022 press kit and current product page','TUDOR introduced the Black Bay Pro ref. M79470 in 2022; the reference remains in the current catalogue.');
   apply('79950','2022–present','TUDOR official Ranger history/current product pages','TUDOR introduced the modern Ranger ref. M79950 in 2022; the reference remains in the current catalogue.');
   apply('79830RB','2018–present','TUDOR official Black Bay GMT 2018 press kit and current product page','TUDOR introduced the Black Bay GMT ref. M79830RB in 2018; the reference remains in the current catalogue.');
+  if (typeof DATABASE_META !== 'undefined' && DATABASE_META) {
+    DATABASE_META.version = '2.82.0';
+    DATABASE_META.updated = '22 September 2026';
+    DATABASE_META.scope = '106 researched reference mappings plus 18 verified production-date updates; latest verified batch: Tudor.';
+  }
 })();
