@@ -240,16 +240,22 @@
 
       htmlOut+='<section class="wi-details-block"><div class="wi-block-title">DEEPER DETAIL</div><div class="wi-accordion">';
       for (var x=0;x<groups.length;x++) {
-        htmlOut+='<details class="wi-detail '+groups[x].tone+'"><summary><span>'+esc(groups[x].label)+'</span><b>+</b></summary><div class="wi-detail-body">'+groups[x].html+'</div></details>';
+        htmlOut+='<div class="wi-detail '+groups[x].tone+'"><button type="button" class="wi-detail-toggle" aria-expanded="false"><span>'+esc(groups[x].label)+'</span><b>+</b></button><div class="wi-detail-body" hidden>'+groups[x].html+'</div></div>';
       }
       htmlOut+='</div></section></div>';
       sections.innerHTML=htmlOut;
 
-      var details=sections.querySelectorAll('.wi-detail');
-      for (var z=0;z<details.length;z++) {
-        details[z].addEventListener('toggle',function(){
-          var b=this.querySelector('summary b');
-          if (b) b.textContent=this.open?'−':'+';
+      var toggles=sections.querySelectorAll('.wi-detail-toggle');
+      for (var z=0;z<toggles.length;z++) {
+        toggles[z].addEventListener('click',function(event){
+          event.preventDefault();
+          event.stopPropagation();
+          var body=this.parentElement.querySelector('.wi-detail-body');
+          var expanded=this.getAttribute('aria-expanded')==='true';
+          this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          if (body) body.hidden=expanded;
+          var mark=this.querySelector('b');
+          if (mark) mark.textContent=expanded ? '+' : '−';
         });
       }
     } finally {
@@ -311,12 +317,13 @@
       '.wi-no-findings{padding:12px;border:1px dashed #273548;border-radius:10px;color:#7f8fa4;font-size:11px}',
       '.wi-accordion{display:grid;gap:7px}',
       '.wi-detail{border:1px solid #202c3c;border-radius:10px;background:#081019;overflow:hidden}',
-      '.wi-detail summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 13px;cursor:pointer;color:#cbd5e1;font-size:11px;font-weight:900}',
-      '.wi-detail summary::-webkit-details-marker{display:none}',
-      '.wi-detail summary b{font-size:18px;line-height:1;color:#6b7f99}',
+      '.wi-detail-toggle{width:100%;border:0;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:12px 13px;cursor:pointer;color:#cbd5e1;font-size:11px;font-weight:900;text-align:left}',
+      '.wi-detail-toggle:hover{background:rgba(255,255,255,.025);color:#fff}',
+      '.wi-detail-toggle b{font-size:18px;line-height:1;color:#6b7f99}',
       '.wi-detail.warning{border-color:rgba(245,158,11,.3)}',
       '.wi-detail.danger{border-color:rgba(239,68,68,.36)}',
       '.wi-detail-body{padding:0 13px 13px;color:#aeb9c8;font-size:10px;line-height:1.55}',
+      '.wi-detail-body[hidden]{display:none!important}',
       '.wi-detail-body .provenance-line{display:none!important}',
       '@media(max-width:760px){#compact-watch-information .watch-info-summary{padding:16px}.wi-dashboard-hero{padding:18px 16px;flex-direction:column}.wi-dashboard-title{font-size:22px}.wi-dashboard-facts{padding:14px 16px 17px;grid-template-columns:repeat(2,minmax(0,1fr))}.wi-findings,.wi-details-block{padding:16px}}'
     ].join('\n');
