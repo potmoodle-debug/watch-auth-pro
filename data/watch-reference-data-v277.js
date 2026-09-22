@@ -26,7 +26,7 @@ function add(row){
  const [brand,ref,family,cals,technology,size,reserve]=row,target=targetFor(brand);
  if(!Array.isArray(target))return;
  const pattern=patternFor(brand,ref);
- for(let i=target.length-1;i>=0;i--){const x=target[i],brandOK=target!==OTHER_REFERENCE_RULES||q(x.brand)===q(brand);if(brandOK&&(q(x.baseReference)===q(ref)||(x.pattern instanceof RegExp&&(x.pattern.lastIndex=0,x.pattern.test(ref)))))target.splice(i,1);}
+ for(let i=target.length-1;i>=0;i--){const x=target[i],brandOK=target!==OTHER_REFERENCE_RULES||q(x.brand)===q(brand);if(brandOK&&q(x.baseReference)===q(ref))target.splice(i,1);}
  const calibre=cals?cals.split(','):[];
  target.unshift({...(target===OTHER_REFERENCE_RULES?{brand}:{}),pattern,baseReference:ref,family,size:size||'Reference-specific',calibre,calibreDisplay:calibre[0]||'Not specified',technology:technology||'Movement type not specified',reserve:reserve||'Not specified',notes:ref==='W1003154'?'Corrected source-batch technology: this reference is quartz; calibre 057.':'Researched exact/base-reference mapping from the v2.76.0 missing-reference export.',source:'Manufacturer and specialist reference records',confidence:'High confidence'});
 }
