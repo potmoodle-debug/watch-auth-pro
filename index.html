@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="dark">
-    <title>Watch Auth Pro v2.82.0 — Verified Tudor Production Dates</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Watch Auth Pro v2.82.0 — Build 2823</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css?v=2730">
 </head>
@@ -20,7 +23,7 @@
                 <div>
                     <div class="brand-title">Watch Auth Pro</div>
                     <div class="brand-subtitle">Internal inspection workspace</div>
-                    <div class="database-status" id="database-status">Database loading…</div>
+                    <div class="database-status" id="database-status" data-build="2823">DB v2.82.0 • UPDATED 22 SEPTEMBER 2026 • BUILD 2823</div>
                 </div>
             </div>
             <div class="status-cluster">
@@ -833,5 +836,23 @@
     <script src="features/version-banner-hardfix-v2731.js?v=2822"></script>
     <script src="features/research-queue-recognition-fix-v2732.js?v=2822"></script>
     <script src="features/watch-info-dashboard-v278.js?v=2822"></script>
+    <script>
+(function(){
+  var EXPECTED_BUILD='2823';
+  function stamp(){
+    var el=document.getElementById('database-status');
+    if(!el) return;
+    var meta=(typeof DATABASE_META!=='undefined'&&DATABASE_META)?DATABASE_META:null;
+    if(meta){
+      el.textContent='DB v'+meta.version+' • UPDATED '+String(meta.updated||'').toUpperCase()+' • BUILD '+EXPECTED_BUILD;
+    }else{
+      el.textContent='DATABASE FAILED TO LOAD • BUILD '+EXPECTED_BUILD;
+    }
+    el.setAttribute('data-build',EXPECTED_BUILD);
+  }
+  window.addEventListener('load',stamp);
+  setTimeout(stamp,500);
+})();
+</script>
 </body>
 </html>
