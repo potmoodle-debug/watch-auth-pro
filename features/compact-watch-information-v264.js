@@ -1,12 +1,7 @@
 /* Watch Auth Pro — compact watch information panel
-   Feature introduced in 2.64.0; startup version authority updated for 2.65.0.
-   Replaces scattered reference-result boxes with one click-to-open panel.
+   Feature introduced in 2.64.0.
+   UI-only feature: database version authority belongs to the latest reference-data layer.
 */
-if (typeof DATABASE_META !== 'undefined') {
-  DATABASE_META.version = '2.65.0';
-  DATABASE_META.updated = '20 August 2026';
-  DATABASE_META.scope = 'v2.65.0 researched reference data plus current Watch Auth Pro features';
-}
 
 (() => {
   const PANEL_ID = 'compact-watch-information';
