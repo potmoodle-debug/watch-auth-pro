@@ -203,10 +203,18 @@ if (typeof DATABASE_META !== 'undefined') {
   function completeRma() {
     if (!state || state.date !== todayKey()) loadState();
     syncCompletedCount();
-    state.completed += 1;
+
+    if (typeof window.recordExternalCompletion !== 'function') {
+      throw new Error('Shared completion counter is unavailable.');
+    }
+
     state.rmaCompleted = Math.max(0, Number.parseInt(state.rmaCompleted || '0', 10) || 0) + 1;
     saveState();
+
+    window.recordExternalCompletion('rma');
+    syncCompletedCount();
     render();
+
     return {
       completed: state.completed,
       target: state.target,
