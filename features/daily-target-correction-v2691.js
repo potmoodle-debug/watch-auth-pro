@@ -38,6 +38,10 @@
     if ((state.completed || 0) <= 0 && count <= 0) return;
 
     state.completed = Math.max(0, Number(state.completed || 0) - 1);
+    state.rmaCompleted = Math.min(
+      Math.max(0, Number(state.rmaCompleted || 0)),
+      state.completed
+    );
     const nextCount = Math.max(0, count - 1);
     state.lastCount = nextCount;
     writeState(state);
@@ -49,6 +53,7 @@
     const state = readState();
     if (!state || state.date !== todayKey()) return;
     state.completed = 0;
+    state.rmaCompleted = 0;
     state.lastCount = currentInspectionCount();
     writeState(state);
     refresh();
