@@ -3287,6 +3287,15 @@ const categories = [
             return updateManualReviewQueueActions();
         }
 
+        function recordExternalCompletion(kind = 'other') {
+            inspections++;
+            safeStorageSet('inspection_count', inspections);
+            updateCounterDisplay();
+            return inspections;
+        }
+
+        window.recordExternalCompletion = recordExternalCompletion;
+
         function resetAll() {
             const completedBrand = getSelectedBrand();
             // Automatically preserve unresolved references before the form is cleared.
