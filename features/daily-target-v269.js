@@ -1,10 +1,10 @@
 /* Watch Auth Pro — daily watch target and pace tracker
-   Version 2.69.0 — 9 September 2026
+   Version 2.84.0 — 23 September 2026
 */
 if (typeof DATABASE_META !== 'undefined') {
   DATABASE_META.version = '2.69.0';
   DATABASE_META.updated = '9 September 2026';
-  DATABASE_META.scope = 'Editable daily watch target with automatic completed count, remaining watches, percentage progress and workday pace status.';
+  DATABASE_META.scope = 'Editable daily watch target with authentication and RMA completion breakdown, remaining watches, percentage progress and workday pace status.';
 }
 
 (() => {
@@ -47,6 +47,7 @@ if (typeof DATABASE_META !== 'undefined') {
         date: todayKey(),
         target,
         completed: saved ? 0 : currentCount,
+        rmaCompleted: 0,
         lastCount: currentCount
       };
       saveState();
@@ -57,6 +58,7 @@ if (typeof DATABASE_META !== 'undefined') {
       date: saved.date,
       target,
       completed: Math.max(0, Number.parseInt(saved.completed || '0', 10) || 0),
+      rmaCompleted: Math.max(0, Number.parseInt(saved.rmaCompleted || '0', 10) || 0),
       lastCount: Math.max(0, Number.parseInt(saved.lastCount ?? currentCount, 10) || 0)
     };
   }
@@ -119,6 +121,7 @@ if (typeof DATABASE_META !== 'undefined') {
       .daily-target-completed{font-size:19px;font-weight:950;line-height:1}
       .daily-target-of{font-size:11px;font-weight:800;color:#64748b}
       .daily-target-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:5px;font-size:9px;font-weight:800;color:#94a3b8}
+      .daily-target-breakdown{margin-top:4px;font-size:9px;font-weight:800;color:#64748b;letter-spacing:.02em}
       .daily-target-pace{white-space:nowrap}
       .daily-target-pace.ahead{color:#6ee7b7}.daily-target-pace.on{color:#93c5fd}.daily-target-pace.behind{color:#fbbf24}.daily-target-pace.neutral{color:#94a3b8}
       .daily-target-track{height:4px;margin-top:7px;overflow:hidden;border-radius:999px;background:rgba(51,65,85,.72)}
@@ -153,6 +156,7 @@ if (typeof DATABASE_META !== 'undefined') {
         <span id="daily-target-remaining">50 remaining · 0%</span>
         <span id="daily-target-pace" class="daily-target-pace neutral">On pace</span>
       </div>
+      <div id="daily-target-breakdown" class="daily-target-breakdown">0 Authentication · 0 RMA</div>
       <div class="daily-target-track" aria-hidden="true"><div id="daily-target-fill" class="daily-target-fill"></div></div>`;
     completedStat.insertAdjacentElement('afterend', card);
 
@@ -178,12 +182,16 @@ if (typeof DATABASE_META !== 'undefined') {
     const remaining = Math.max(0, target - completed);
     const percentage = target > 0 ? Math.round((completed / target) * 100) : 0;
     const pace = paceStatus();
+    const rmaCompleted = Math.min(completed, Math.max(0, Number.parseInt(state.rmaCompleted || '0', 10) || 0));
+    const authenticationCompleted = Math.max(0, completed - rmaCompleted);
 
     document.getElementById('daily-target-completed').textContent = completed;
     document.getElementById('daily-target-of').textContent = `/ ${target}`;
     document.getElementById('daily-target-remaining').textContent = completed >= target
       ? `${percentage}% complete`
       : `${remaining} remaining · ${percentage}%`;
+    const breakdownEl = document.getElementById('daily-target-breakdown');
+    if (breakdownEl) breakdownEl.textContent = `${authenticationCompleted} Authentication · ${rmaCompleted} RMA`;
     const paceEl = document.getElementById('daily-target-pace');
     paceEl.textContent = pace.text;
     paceEl.className = `daily-target-pace ${pace.tone}`;
@@ -192,10 +200,30 @@ if (typeof DATABASE_META !== 'undefined') {
     card.classList.toggle('complete', completed >= target);
   }
 
+  function completeRma() {
+    if (!state || state.date !== todayKey()) loadState();
+    syncCompletedCount();
+    state.completed += 1;
+    state.rmaCompleted = Math.max(0, Number.parseInt(state.rmaCompleted || '0', 10) || 0) + 1;
+    saveState();
+    render();
+    return {
+      completed: state.completed,
+      target: state.target,
+      rmaCompleted: state.rmaCompleted,
+      authenticationCompleted: Math.max(0, state.completed - state.rmaCompleted)
+    };
+  }
+
   function syncAndRender() {
     syncCompletedCount();
     render();
   }
+
+  window.WatchAuthDailyTarget = {
+    completeRma,
+    getState: () => state ? { ...state } : null
+  };
 
   function wrapCounterUpdate() {
     if (typeof updateCounterDisplay !== 'function' || updateCounterDisplay.__dailyTargetWrapped) return;
