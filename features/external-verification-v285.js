@@ -70,7 +70,7 @@
     var s=document.createElement('style');
     s.id=STYLE_ID;
     s.textContent=[
-      '#'+BUTTON_ID+'{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;border:1px solid rgba(59,130,246,.55);border-radius:10px;background:linear-gradient(145deg,rgba(37,99,235,.22),rgba(8,17,27,.96));color:#dbeafe;font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}',
+      '.ev-launch-row{display:flex;justify-content:flex-end;padding:0 22px 18px;margin-top:-4px}',\n      '#'+BUTTON_ID+'{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:250px;padding:11px 16px;border:1px solid rgba(59,130,246,.55);border-radius:10px;background:linear-gradient(145deg,rgba(37,99,235,.22),rgba(8,17,27,.96));color:#dbeafe;font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}',
       '#'+BUTTON_ID+':hover{border-color:#60a5fa;background:linear-gradient(145deg,rgba(37,99,235,.33),rgba(8,17,27,.96));color:#fff}',
       '#'+BUTTON_ID+' .ev-dot{width:8px;height:8px;border-radius:50%;background:#60a5fa;box-shadow:0 0 12px rgba(96,165,250,.95)}',
       '#'+MODAL_ID+'{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px)}',
@@ -102,7 +102,7 @@
       '.ev-primary{border:1px solid #2563eb;background:#1d4ed8;color:#fff}',
       '.ev-secondary{border:1px solid #2a394b;background:#0a131e;color:#aebed0}',
       '.ev-note{margin-top:14px;border:1px solid rgba(245,158,11,.28);background:rgba(120,53,15,.09);border-radius:10px;padding:10px 12px;color:#c7a66b;font-size:9px;line-height:1.5}',
-      '@media(max-width:760px){.ev-fields{grid-template-columns:1fr}.ev-grid{grid-template-columns:1fr}.ev-head{padding:18px}.ev-body{padding:16px}}'
+      '@media(max-width:760px){.ev-fields{grid-template-columns:1fr}.ev-grid{grid-template-columns:1fr}.ev-head{padding:18px}.ev-body{padding:16px}.ev-launch-row{padding:0 16px 16px}.ev-launch-row #'+BUTTON_ID+'{width:100%;min-width:0}}'
     ].join('\n');
     document.head.appendChild(s);
   }
@@ -198,14 +198,19 @@
   function installButton(){
     if(document.getElementById(BUTTON_ID)) return true;
     var target=document.querySelector('#compact-watch-information .watch-info-summary') || document.querySelector('.wi-dashboard-hero');
-    if(!target) return false;
+    if(!target || !target.parentNode) return false;
+
+    var row=document.createElement('div');
+    row.className='ev-launch-row';
+
     var btn=document.createElement('button');
     btn.type='button';
     btn.id=BUTTON_ID;
     btn.innerHTML='<span class="ev-dot"></span>Search external sources';
     btn.addEventListener('click',openModal);
-    var left=target.querySelector('div') || target;
-    left.appendChild(btn);
+
+    row.appendChild(btn);
+    target.parentNode.insertBefore(row,target.nextSibling);
     return true;
   }
 
