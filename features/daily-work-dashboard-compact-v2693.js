@@ -44,20 +44,14 @@
   }
 
   function completedToday() {
-    const today = dateKey();
-    return readHistory().filter(record => {
-      if (!record) return false;
-      if (record.id) {
-        const d = new Date(Number(record.id));
-        if (Number.isFinite(d.getTime()) && dateKey(d) === today) return true;
-      }
-      // Older history records may only have the locale timestamp string.
-      if (record.timestamp) {
-        const d = new Date(record.timestamp);
-        if (Number.isFinite(d.getTime()) && dateKey(d) === today) return true;
-      }
-      return false;
-    }).length;
+    // The dashboard must use the same shared completion total as the header.
+    // watch_history contains authentication records only, so using its length
+    // excludes RMAs and makes dashboard progress lag behind the real total.
+    const storedCount = Number.parseInt(localStorage.getItem('inspection_count') || '0', 10);
+    if (Number.isFinite(storedCount) && storedCount >= 0) return storedCount;
+
+    const displayedCount = Number.parseInt(document.getElementById('inspection-count')?.textContent || '0', 10);
+    return Number.isFinite(displayedCount) && displayedCount >= 0 ? displayedCount : 0;
   }
 
   function workingMinutesBetween(start, end) {
