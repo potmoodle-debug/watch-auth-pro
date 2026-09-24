@@ -9,12 +9,7 @@
     var meta = (typeof DATABASE_META !== 'undefined' && DATABASE_META) ? DATABASE_META : {};
     var version = meta.version || 'loading';
     var updated = meta.updated || '';
-    var appVersion = el.getAttribute('data-app-version') || '';
-    var build = el.getAttribute('data-build') || '';
-    var desired = (appVersion ? 'APP v' + appVersion + ' • ' : '') +
-      'DB v' + version +
-      (updated ? ' • UPDATED ' + String(updated).toUpperCase() : '') +
-      (build ? ' • BUILD ' + build : '');
+    var desired = 'DB v' + version + (updated ? ' • UPDATED ' + String(updated).toUpperCase() : '');
 
     if (el.textContent !== desired) el.textContent = desired;
   }
