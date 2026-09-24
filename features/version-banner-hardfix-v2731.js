@@ -9,7 +9,7 @@
     var meta = (typeof DATABASE_META !== 'undefined' && DATABASE_META) ? DATABASE_META : {};
     var version = meta.version || 'loading';
     var updated = meta.updated || '';
-    var desired = 'DB v' + version + (updated ? ' • UPDATED ' + String(updated).toUpperCase() : '');
+    var build = el.getAttribute('data-build') || '';\n    var desired = 'DB v' + version + (updated ? ' • UPDATED ' + String(updated).toUpperCase() : '') + (build ? ' • BUILD ' + build : '');
 
     if (el.textContent !== desired) el.textContent = desired;
   }
