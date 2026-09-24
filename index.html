@@ -859,16 +859,18 @@
     <script src="features/watch-info-dashboard-v278.js?v=2822"></script>
     <script>
 (function(){
+  var APP_VERSION='2.84.1';
   var EXPECTED_BUILD='2841';
   function stamp(){
     var el=document.getElementById('database-status');
     if(!el) return;
     var meta=(typeof DATABASE_META!=='undefined'&&DATABASE_META)?DATABASE_META:null;
     if(meta){
-      el.textContent='DB v'+meta.version+' • UPDATED '+String(meta.updated||'').toUpperCase()+' • BUILD '+EXPECTED_BUILD;
+      el.textContent='APP v'+APP_VERSION+' • DB v'+meta.version+' • UPDATED '+String(meta.updated||'').toUpperCase()+' • BUILD '+EXPECTED_BUILD;
     }else{
-      el.textContent='DATABASE FAILED TO LOAD • BUILD '+EXPECTED_BUILD;
+      el.textContent='APP v'+APP_VERSION+' • DATABASE FAILED TO LOAD • BUILD '+EXPECTED_BUILD;
     }
+    el.setAttribute('data-app-version',APP_VERSION);
     el.setAttribute('data-build',EXPECTED_BUILD);
   }
   window.addEventListener('load',stamp);
