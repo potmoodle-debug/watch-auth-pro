@@ -197,7 +197,7 @@
 
   function installButton(){
     if(document.getElementById(BUTTON_ID)) return true;
-    var target=document.querySelector('.wi-dashboard-hero') || document.querySelector('#compact-watch-information .watch-info-summary');
+    var target=document.querySelector('#compact-watch-information .watch-info-summary') || document.querySelector('.wi-dashboard-hero');
     if(!target) return false;
     var btn=document.createElement('button');
     btn.type='button';
