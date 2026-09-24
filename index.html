@@ -854,22 +854,21 @@
     <script src="app.js?v=2841"></script>
     <script src="features/tag-calibre-11-reminder-v2651.js"></script>
     <script src="features/ginza-temporary-v2641.js?v=2824"></script>
+    <script src="features/version-banner-hardfix-v2731.js?v=2822"></script>
     <script src="features/research-queue-recognition-fix-v2732.js?v=2822"></script>
     <script src="features/watch-info-dashboard-v278.js?v=2822"></script>
     <script>
 (function(){
-  var APP_VERSION='2.84.1';
   var EXPECTED_BUILD='2841';
   function stamp(){
     var el=document.getElementById('database-status');
     if(!el) return;
     var meta=(typeof DATABASE_META!=='undefined'&&DATABASE_META)?DATABASE_META:null;
     if(meta){
-      el.textContent='APP v'+APP_VERSION+' • DB v'+meta.version+' • UPDATED '+String(meta.updated||'').toUpperCase()+' • BUILD '+EXPECTED_BUILD;
+      el.textContent='DB v'+meta.version+' • UPDATED '+String(meta.updated||'').toUpperCase()+' • BUILD '+EXPECTED_BUILD;
     }else{
-      el.textContent='APP v'+APP_VERSION+' • DATABASE FAILED TO LOAD • BUILD '+EXPECTED_BUILD;
+      el.textContent='DATABASE FAILED TO LOAD • BUILD '+EXPECTED_BUILD;
     }
-    el.setAttribute('data-app-version',APP_VERSION);
     el.setAttribute('data-build',EXPECTED_BUILD);
   }
   window.addEventListener('load',stamp);
