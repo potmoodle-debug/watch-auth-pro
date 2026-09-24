@@ -1,5 +1,5 @@
 /* Watch Auth Pro — daily watch target and pace tracker
-   Version 2.84.0 — 23 September 2026
+   Version 2.84.1 — 24 September 2026
 */
 if (typeof DATABASE_META !== 'undefined') {
   DATABASE_META.version = '2.69.0';
@@ -208,11 +208,24 @@ if (typeof DATABASE_META !== 'undefined') {
       throw new Error('Shared completion counter is unavailable.');
     }
 
-    state.rmaCompleted = Math.max(0, Number.parseInt(state.rmaCompleted || '0', 10) || 0) + 1;
-    saveState();
+    const beforeCompleted = state.completed;
+    const beforeInspectionCount = readInspectionCount();
 
+    // Update the shared session counter first so the main completed count remains
+    // consistent with normal authentication completions.
     window.recordExternalCompletion('rma');
-    syncCompletedCount();
+
+    // RMA completion must never depend on the counter observer/wrapper firing.
+    // Explicitly account for exactly one completed job here, then align lastCount
+    // with the shared counter so the next sync cannot double-count it.
+    const afterInspectionCount = readInspectionCount();
+    state.completed = beforeCompleted + 1;
+    state.rmaCompleted = Math.max(0, Number.parseInt(state.rmaCompleted || '0', 10) || 0) + 1;
+    state.lastCount = Math.max(
+      afterInspectionCount,
+      beforeInspectionCount + 1
+    );
+    saveState();
     render();
 
     return {
