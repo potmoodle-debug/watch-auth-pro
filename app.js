@@ -433,14 +433,15 @@ const categories = [
             }
 
             const rule = result.rule;
-            renderInformationBox(box, 'info', 'Breitling reference identified',
+            renderInformationBox(box, rule.manualReview ? 'warning' : 'info', rule.manualReview ? 'Breitling reference requires manual review' : 'Breitling reference identified',
                 `<strong>${rule.family}</strong> · ${rule.size}<br>` +
                 `Reference family: <strong>${rule.baseReference}</strong> · ${rule.production}<br>` +
                 `Expected movement: <strong>${rule.calibreDisplay}</strong><br>` +
+                `Power reserve: <strong>${rule.reserve || 'Not specified'}</strong><br>` +
                 `Movement type: <strong>${rule.technology}</strong><br>` +
                 `Functions: ${rule.functions}<br>` +
                 `Case specification: ${rule.caseDetails}` +
-                `<div class="mt-2">${rule.notes}</div>` + provenanceHtml(rule, 'Breitling')
+                `<div class="mt-2">${rule.notes}</div>` + provenanceHtml(rule, 'Breitling') + (rule.manualReview ? missingReferenceButtonHtml() : '')
             );
 
             if (movementBox) {
@@ -461,7 +462,7 @@ const categories = [
                 }
             }
             queueMicrotask(updateManualReviewQueueActions);
-                return { ...result, recognised: true };
+                return { ...result, recognised: !rule.manualReview };
         }
 
 
