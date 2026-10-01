@@ -94,7 +94,26 @@
   function benchCue(rule) {
     var notes=clean(rule && rule.notes);
     if (!notes) return '';
-    return notes.replace(/(?:^|;\\s*)Case\\s*:[^;]*/ig,'').replace(/(?:^|;\\s*)Functions\\s*:[^;]*/ig,'').replace(/^\\s*;|;\\s*$/g,'').trim();
+    var parts=notes.split(/;\\s*/).map(clean).filter(Boolean);
+    var keep=parts.filter(function(p){
+      return !/^(case|functions?)\\s*:/i.test(p) &&
+        !/^\\d{2,4}\\s*m\\b/i.test(p) &&
+        !/^(time only|date|day|chronograph|traveller gmt)\\b/i.test(p);
+    });
+    return keep.join('; ');
+  }
+  function isDuplicateBenchText(text, rule, observed) {
+    var t=key(text);
+    if (!t) return true;
+    var known=[
+      rule&&rule.family, rule&&rule.model, expectedCalibre(rule), observed,
+      expectedCase(rule), expectedFunctions(rule), rule&&rule.size,
+      production(rule), rule&&rule.reserve, water(rule)
+    ].map(key).filter(Boolean);
+    for (var i=0;i<known.length;i++) {
+      if (t===known[i] || (known[i].length>8 && t.indexOf(known[i])>=0 && t.length<known[i].length+35)) return true;
+    }
+    return false;
   }
 
   function cleanSourceHtml(el) {
@@ -154,6 +173,7 @@
       for (var j=0;j<parts.length && result.length<6;j++) {
         if (/source|confidence|database source/i.test(parts[j])) continue;
         if (rule && rule.family && key(parts[j])===key(rule.family)) continue;
+        if (isDuplicateBenchText(parts[j],rule,observed)) continue;
         add(parts[j],sources[i].tone);
       }
     }
@@ -216,7 +236,7 @@
 
       var found=findings(sources,rule,observed);
       var cue=benchCue(rule);
-      if (cue && found.length<6) found.unshift({text:compact(cue,175),tone:'info'});
+      if (cue && !isDuplicateBenchText(cue,rule,observed) && found.length<6) found.unshift({text:compact(cue,175),tone:'info'});
       var groups=[], seenText={};
       for (var g=0;g<sources.length;g++) {
         var html=cleanSourceHtml(sources[g].el);
