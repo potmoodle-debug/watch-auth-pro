@@ -82,6 +82,20 @@
     return m ? m[1]+' m' : '';
   }
   function production(rule) { return first(rule && rule.production, rule && rule.era); }
+  function noteField(rule,label) {
+    var notes=clean(rule && rule.notes);
+    if (!notes) return '';
+    var re=new RegExp('(?:^|[.;]\\s*)'+label+'\\s*:\\s*([^.;]+(?:\\.[^;]+)?)(?=;|$)','i');
+    var m=notes.match(re);
+    return m ? clean(m[1]) : '';
+  }
+  function expectedCase(rule) { return first(rule && rule.caseDetails, noteField(rule,'Case')); }
+  function expectedFunctions(rule) { return first(rule && rule.functions, noteField(rule,'Functions')); }
+  function benchCue(rule) {
+    var notes=clean(rule && rule.notes);
+    if (!notes) return '';
+    return notes.replace(/(?:^|;\\s*)Case\\s*:[^;]*/ig,'').replace(/(?:^|;\\s*)Functions\\s*:[^;]*/ig,'').replace(/^\\s*;|;\\s*$/g,'').trim();
+  }
 
   function cleanSourceHtml(el) {
     if (!el) return '';
@@ -192,15 +206,17 @@
       if (overview) overview.innerHTML='';
 
       var facts=[
-        ['EXPECTED CALIBRE',exp,'featured'],
-        ['OBSERVED CALIBRE',observed,observed&&exp?'observed':''],
-        ['SIZE',first(rule&&rule.size),''],
-        ['PRODUCTION',production(rule),''],
-        ['POWER RESERVE',first(rule&&rule.reserve),''],
-        ['WATER RESISTANCE',water(rule),'']
+        ['EXPECTED MOVEMENT',exp,'featured'],
+        ['MOVEMENT IN HAND',observed,observed&&exp?'observed':''],
+        ['EXPECTED CASE',expectedCase(rule),''],
+        ['EXPECTED FUNCTIONS',expectedFunctions(rule),''],
+        ['CASE SIZE',first(rule&&rule.size),''],
+        ['PRODUCTION PERIOD',production(rule),'']
       ].filter(function(x){return clean(x[1]);});
 
       var found=findings(sources,rule,observed);
+      var cue=benchCue(rule);
+      if (cue && found.length<6) found.unshift({text:compact(cue,175),tone:'info'});
       var groups=[], seenText={};
       for (var g=0;g<sources.length;g++) {
         var html=cleanSourceHtml(sources[g].el);
@@ -225,7 +241,7 @@
         htmlOut+='</div>';
       }
 
-      htmlOut+='<section class="wi-findings"><div class="wi-block-title">WHAT MATTERS</div>';
+      htmlOut+='<section class="wi-findings"><div class="wi-block-title">BENCH CHECKS · WHAT SHOULD BE ON THIS WATCH?</div>';
       if (found.length) {
         htmlOut+='<div class="wi-findings-list">';
         for (var q=0;q<found.length;q++) {
@@ -234,11 +250,11 @@
         }
         htmlOut+='</div>';
       } else {
-        htmlOut+='<div class="wi-no-findings">No additional authentication warnings are currently being raised.</div>';
+        htmlOut+='<div class="wi-no-findings">No reference-specific warning is currently being raised. Compare the physical watch against the expected movement, case, functions and production period above.</div>';
       }
       htmlOut+='</section>';
 
-      htmlOut+='<section class="wi-details-block"><div class="wi-block-title">DEEPER DETAIL</div><div class="wi-accordion">';
+      htmlOut+='<section class="wi-details-block"><div class="wi-block-title">DEEPER REFERENCE INFORMATION</div><div class="wi-accordion">';
       for (var x=0;x<groups.length;x++) {
         htmlOut+='<div class="wi-detail '+groups[x].tone+'"><button type="button" class="wi-detail-toggle" aria-expanded="false"><span>'+esc(groups[x].label)+'</span><b>+</b></button><div class="wi-detail-body" hidden>'+groups[x].html+'</div></div>';
       }
