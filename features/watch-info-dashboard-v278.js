@@ -32,12 +32,22 @@
     return el ? el.value : '';
   }
   function first() {
-    for (var i=0;i<arguments.length;i++) if (clean(arguments[i])) return clean(arguments[i]);
+    for (var i=0;i<arguments.length;i++) {
+      var v=useful(arguments[i]);
+      if (v) return v;
+    }
     return '';
   }
   function compact(v,n) {
     var s=clean(v), max=n||170;
     return s.length>max ? s.slice(0,max-1).trim()+'…' : s;
+  }
+  function useful(v) {
+    var s=clean(v);
+    if (!s) return '';
+    if (/^(?:—|-|n\/a|na|unknown|not known|not available|not recorded|not provided|unavailable|tbc|tbd|period)$/i.test(s)) return '';
+    if (/^(?:no data|no information|information unavailable|reference data unavailable)$/i.test(s)) return '';
+    return s;
   }
 
   function visibleSource(el) {
@@ -140,10 +150,12 @@
     }
     return out.filter(function(t){
       return t.length>=12 && t.length<=260 &&
+        !!useful(t) &&
         !/^source\s*:/i.test(t) &&
         !/^confidence\s*:/i.test(t) &&
         !/enter identifiers?.*to begin/i.test(t) &&
-        !/enter a case reference or serial number/i.test(t);
+        !/enter a case reference or serial number/i.test(t) &&
+        !/\b(?:unknown|not available|not recorded|not provided|no data)\b/i.test(t);
     });
   }
 
@@ -237,7 +249,7 @@
         ['EXPECTED FUNCTIONS',expectedFunctions(rule),''],
         ['CASE SIZE',first(rule&&rule.size),''],
         ['PRODUCTION PERIOD',production(rule),'']
-      ].filter(function(x){return clean(x[1]);});
+      ].map(function(x){ x[1]=useful(x[1]); return x; }).filter(function(x){return !!x[1];});
 
       var found=findings(sources,rule,observed);
       var cue=benchCue(rule);
@@ -266,26 +278,25 @@
         htmlOut+='</div>';
       }
 
-      htmlOut+='<section class="wi-findings"><div class="wi-block-title">BENCH CHECKS · WHAT SHOULD BE ON THIS WATCH?</div>';
       if (!rule) {
-        htmlOut+='<div class="wi-no-findings wi-data-needed"><strong>No reference-specific authentication record is loaded for '+esc(ref||'this reference')+'.</strong><br>Add it to the research queue rather than treating the absence of warnings as a pass.</div>';
+        htmlOut+='<section class="wi-findings wi-limited-data"><div class="wi-data-needed"><strong>LIMITED REFERENCE DATA</strong><span>'+esc(ref||'This reference')+' is not yet mapped deeply enough for reference-specific bench checks.</span></div></section>';
       } else if (found.length) {
-        htmlOut+='<div class="wi-findings-list">';
+        htmlOut+='<section class="wi-findings"><div class="wi-block-title">BENCH CHECKS · WHAT SHOULD BE ON THIS WATCH?</div><div class="wi-findings-list">';
         for (var q=0;q<found.length;q++) {
           var mark=found[q].tone==='danger'||found[q].tone==='warning'?'!':'✓';
           htmlOut+='<div class="wi-finding '+found[q].tone+'"><span class="wi-finding-mark">'+mark+'</span><strong>'+esc(found[q].text)+'</strong></div>';
         }
-        htmlOut+='</div>';
-      } else {
-        htmlOut+='<div class="wi-no-findings">No reference-specific warning is currently being raised. Compare the physical watch against the expected movement, case, functions and production period above.</div>';
+        htmlOut+='</div></section>';
       }
-      htmlOut+='</section>';
 
-      htmlOut+='<section class="wi-details-block"><div class="wi-block-title">DEEPER REFERENCE INFORMATION</div><div class="wi-accordion">';
-      for (var x=0;x<groups.length;x++) {
-        htmlOut+='<div class="wi-detail '+groups[x].tone+'"><button type="button" class="wi-detail-toggle" aria-expanded="false"><span>'+esc(groups[x].label)+'</span><b>+</b></button><div class="wi-detail-body" hidden>'+groups[x].html+'</div></div>';
+      if (groups.length) {
+        htmlOut+='<section class="wi-details-block"><div class="wi-block-title">DEEPER REFERENCE INFORMATION</div><div class="wi-accordion">';
+        for (var x=0;x<groups.length;x++) {
+          htmlOut+='<div class="wi-detail '+groups[x].tone+'"><button type="button" class="wi-detail-toggle" aria-expanded="false"><span>'+esc(groups[x].label)+'</span><b>+</b></button><div class="wi-detail-body" hidden>'+groups[x].html+'</div></div>';
+        }
+        htmlOut+='</div></section>';
       }
-      htmlOut+='</div></section></div>';
+      htmlOut+='</div>';
       sections.innerHTML=htmlOut;
 
       var toggles=sections.querySelectorAll('.wi-detail-toggle');
@@ -359,8 +370,10 @@
       '.wi-finding.danger{border-color:rgba(239,68,68,.42);background:rgba(69,10,10,.16)}',
       '.wi-finding.danger .wi-finding-mark{background:rgba(239,68,68,.18);color:#fca5a5}',
       '.wi-no-findings{padding:12px;border:1px dashed #273548;border-radius:10px;color:#7f8fa4;font-size:11px}',
-      '.wi-data-needed{border-color:rgba(59,130,246,.36);background:rgba(37,99,235,.08);color:#9fb4cf;line-height:1.5}',
-      '.wi-data-needed strong{color:#dbeafe}',
+      '.wi-limited-data{padding-top:14px;padding-bottom:14px}',
+      '.wi-data-needed{display:flex;align-items:center;gap:12px;border:1px solid rgba(59,130,246,.28);border-radius:10px;padding:11px 12px;background:rgba(37,99,235,.07);color:#8294aa;font-size:10px;line-height:1.4}',
+      '.wi-data-needed strong{flex:none;color:#93c5fd;font-size:9px;letter-spacing:.12em}',
+      '.wi-data-needed span{color:#8294aa}',
       '.wi-accordion{display:grid;gap:7px}',
       '.wi-detail{border:1px solid #202c3c;border-radius:10px;background:#081019;overflow:hidden}',
       '.wi-detail-toggle{width:100%;border:0;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:12px 13px;cursor:pointer;color:#cbd5e1;font-size:11px;font-weight:900;text-align:left}',
