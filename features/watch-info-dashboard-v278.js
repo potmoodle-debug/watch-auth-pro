@@ -139,7 +139,11 @@
       out=clean(clone.textContent).split(/[.!?]\s+|\s*[•·]\s*/).map(clean).filter(Boolean);
     }
     return out.filter(function(t){
-      return t.length>=12 && t.length<=260 && !/^source\s*:/i.test(t) && !/^confidence\s*:/i.test(t);
+      return t.length>=12 && t.length<=260 &&
+        !/^source\s*:/i.test(t) &&
+        !/^confidence\s*:/i.test(t) &&
+        !/enter identifiers?.*to begin/i.test(t) &&
+        !/enter a case reference or serial number/i.test(t);
     });
   }
 
@@ -206,10 +210,11 @@
         if (visibleSource(el)) sources.push({el:el,label:SOURCES[i][1],tone:sourceTone(el)});
       }
 
-      var overall='success';
+      var overall=rule?'success':'unknown';
       for (var t=0;t<sources.length;t++) if (sources[t].tone==='warning') overall='warning';
       for (var d=0;d<sources.length;d++) if (sources[d].tone==='danger') overall='danger';
-      var statusText=overall==='danger'?'ATTENTION':overall==='warning'?'REVIEW':'CONSISTENT';
+      if (!rule && overall!=='danger' && overall!=='warning') overall='unknown';
+      var statusText=overall==='danger'?'ATTENTION':overall==='warning'?'REVIEW':overall==='unknown'?'DATA NEEDED':'CONSISTENT';
 
       panel.classList.add('wi-bold-dashboard');
       panel.classList.toggle('watch-info-attention',overall==='danger');
@@ -262,7 +267,9 @@
       }
 
       htmlOut+='<section class="wi-findings"><div class="wi-block-title">BENCH CHECKS · WHAT SHOULD BE ON THIS WATCH?</div>';
-      if (found.length) {
+      if (!rule) {
+        htmlOut+='<div class="wi-no-findings wi-data-needed"><strong>No reference-specific authentication record is loaded for '+esc(ref||'this reference')+'.</strong><br>Add it to the research queue rather than treating the absence of warnings as a pass.</div>';
+      } else if (found.length) {
         htmlOut+='<div class="wi-findings-list">';
         for (var q=0;q<found.length;q++) {
           var mark=found[q].tone==='danger'||found[q].tone==='warning'?'!':'✓';
@@ -330,6 +337,7 @@
       '.wi-dashboard-status.success{color:#6ee7b7;background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.38)}',
       '.wi-dashboard-status.warning{color:#fcd34d;background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.42)}',
       '.wi-dashboard-status.danger{color:#fca5a5;background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.48)}',
+      '.wi-dashboard-status.unknown{color:#93c5fd;background:rgba(59,130,246,.10);border-color:rgba(59,130,246,.36)}',
       '.wi-dashboard-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;padding:16px 22px 20px;border-bottom:1px solid rgba(148,163,184,.11)}',
       '.wi-fact{min-height:72px;padding:12px 13px;border:1px solid #202d3e;border-radius:11px;background:#08111b}',
       '.wi-fact span{display:block;font-size:8px;font-weight:950;letter-spacing:.14em;color:#64748b;margin-bottom:7px}',
@@ -351,6 +359,8 @@
       '.wi-finding.danger{border-color:rgba(239,68,68,.42);background:rgba(69,10,10,.16)}',
       '.wi-finding.danger .wi-finding-mark{background:rgba(239,68,68,.18);color:#fca5a5}',
       '.wi-no-findings{padding:12px;border:1px dashed #273548;border-radius:10px;color:#7f8fa4;font-size:11px}',
+      '.wi-data-needed{border-color:rgba(59,130,246,.36);background:rgba(37,99,235,.08);color:#9fb4cf;line-height:1.5}',
+      '.wi-data-needed strong{color:#dbeafe}',
       '.wi-accordion{display:grid;gap:7px}',
       '.wi-detail{border:1px solid #202c3c;border-radius:10px;background:#081019;overflow:hidden}',
       '.wi-detail-toggle{width:100%;border:0;background:transparent;display:flex;justify-content:space-between;align-items:center;padding:12px 13px;cursor:pointer;color:#cbd5e1;font-size:11px;font-weight:900;text-align:left}',
