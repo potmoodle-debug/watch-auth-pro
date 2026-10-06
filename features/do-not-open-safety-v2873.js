@@ -77,10 +77,7 @@
     return [rule.family,rule.model,rule.name,rule.collection,rule.notes].filter(Boolean).join(' ');
   }
   function brandMatches(ruleBrand, actual) {
-    var a=norm(actual), b=norm(ruleBrand);
-    if (b==='UBOAT') return a==='UBOAT' || a==='U-BOAT';
-    if (b==='BELL&ROSS') return a==='BELL&ROSS' || a==='BELLROSS';
-    return a===b;
+    return norm(actual)===norm(ruleBrand);
   }
   function match() {
     var brand=selectedBrand(), ref=reference(), resolved=resolveRule(brand,ref), name=modelText(resolved);
@@ -123,6 +120,13 @@
     if (panel) panel.classList.toggle('wap-do-not-open',!!hit);
     if (!hit) {
       if (existing) existing.remove();
+      var clearTechnical=document.querySelector('.panel-technical');
+      var clearDesc=clearTechnical && clearTechnical.querySelector('.panel-description');
+      if (clearDesc && clearDesc.dataset.wapOriginalDescription) {
+        clearDesc.textContent=clearDesc.dataset.wapOriginalDescription;
+        delete clearDesc.dataset.wapOriginalDescription;
+        clearDesc.classList.remove('wap-do-not-open-tech-note');
+      }
       return;
     }
 
@@ -139,7 +143,7 @@
     }
 
     var r=hit.rule;
-    existing.innerHTML=
+    var warningHtml=
       '<div class="dno-kicker">SPECIAL CASE · BENCH SAFETY</div>'+
       '<div class="dno-title">⛔ DO NOT OPEN</div>'+
       '<div class="dno-copy">'+esc(r.reason)+'</div>'+
@@ -147,12 +151,15 @@
       (hit.ref?'<span>REF '+esc(hit.ref)+'</span>':'')+
       '<span>'+esc(r.medium)+'</span></div>'+
       '<div class="dno-action">'+esc(r.action)+'</div>';
+    if (existing.innerHTML!==warningHtml) existing.innerHTML=warningHtml;
 
     if (technical) {
       var desc=technical.querySelector('.panel-description');
+      var stopText='SPECIAL CASE IDENTIFIED — do not open this watch. Complete external authentication only and follow the escalation instruction above.';
       if (desc) {
+        if (!desc.dataset.wapOriginalDescription) desc.dataset.wapOriginalDescription=desc.textContent;
         desc.classList.add('wap-do-not-open-tech-note');
-        desc.textContent='SPECIAL CASE IDENTIFIED — do not open this watch. Complete external authentication only and follow the escalation instruction above.';
+        if (desc.textContent!==stopText) desc.textContent=stopText;
       }
     }
   }
