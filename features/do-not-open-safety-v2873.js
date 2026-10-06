@@ -23,6 +23,13 @@
     },
     {
       brand: 'Sinn',
+      names: /\bEZM\b/i,
+      medium: 'SPECIAL-CASE FAMILY — exact filling depends on EZM model',
+      reason: 'Sinn EZM family detected. Some EZM models are HYDRO oil-filled (including EZM 2 / EZM 2B), while many others use Ar-Dehumidifying protective-gas technology. Exact model/reference must be resolved before opening.',
+      action: 'DO NOT OPEN UNTIL THE EXACT EZM MODEL IS CONFIRMED. External authentication only; then follow the model-specific Sinn service procedure.'
+    },
+    {
+      brand: 'Sinn',
       refs: ['1020.020'],
       names: /(?:Ar[- ]?Dehumidifying|Ar[- ]?Trockenhaltetechnik|protective gas|drying capsule|\bU2(?:\s|$)|103\s+Ti\s+TESTAF|756\s+DIAPAL)/i,
       medium: 'Protective-gas / dry-atmosphere system',
