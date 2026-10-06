@@ -7,7 +7,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Watch Auth Pro v2.88.0 — Build 2883</title>
+    <title>Watch Auth Pro v2.89.0 — Build 2890</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css?v=2730">
 </head>
@@ -23,7 +23,7 @@
                 <div>
                     <div class="brand-title">Watch Auth Pro</div>
                     <div class="brand-subtitle">Internal inspection workspace</div>
-                    <div class="database-status" id="database-status" data-build="2883">DB v2.88.0 • UPDATED 6 OCTOBER 2026 • BUILD 2883</div>
+                    <div class="database-status" id="database-status" data-build="2890">DB v2.89.0 • UPDATED 6 OCTOBER 2026 • BUILD 2890</div>
                 </div>
             </div>
             <div class="status-cluster">
@@ -813,6 +813,7 @@
     <script src="data/tudor-reference-master-v285.js?v=2851"></script>
     <script src="data/breitling-reference-master-v286.js?v=2860"></script>
     <script src="data/watch-reference-data-v288.js?v=2883"></script>
+    <script src="data/watch-reference-data-v289.js?v=2890"></script>
 
     <script src="features/calibre-suggest-v256.js?v=2822"></script>
     <script src="features/custom-brand-v257.js?v=2822"></script>
@@ -847,9 +848,9 @@
          Reference-data version belongs to the data layer, not feature scripts.
          Legacy feature assignments are accepted syntactically but ignored. */
       if (typeof DATABASE_META !== 'undefined' && DATABASE_META) {
-        var __wapDbVersion = '2.88.0';
+        var __wapDbVersion = '2.89.0';
         var __wapDbUpdated = '6 October 2026';
-        var __wapDbScope = 'Missing-reference research merge: verified reference mappings, brand corrections, family-only manual guidance and specialist service warnings. Unresolved rows remain excluded pending research.';
+        var __wapDbScope = 'Focused missing-information batch covering Tudor, Cartier, Bremont Supermarine family guidance and Omega Planet Ocean Chronograph reference mapping.';
         Object.defineProperty(DATABASE_META, 'version', {
           enumerable: true, configurable: true,
           get: function(){ return __wapDbVersion; },
@@ -866,7 +867,7 @@
           set: function(_value){ /* ignore legacy feature-level scope writes */ }
         });
       }
-      document.title = 'Watch Auth Pro v2.88.0 — Build 2883';
+      document.title = 'Watch Auth Pro v2.89.0 — Build 2890';
     </script>
     <script src="app.js?v=2841"></script>
     <script src="features/tag-calibre-11-reminder-v2651.js"></script>
@@ -877,7 +878,7 @@
     <script src="features/do-not-open-safety-v2873.js?v=2873"></script>
     <script>
 (function(){
-  var EXPECTED_BUILD='2883';
+  var EXPECTED_BUILD='2890';
   function stamp(){
     var el=document.getElementById('database-status');
     if(!el) return;
