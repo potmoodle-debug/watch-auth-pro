@@ -166,6 +166,19 @@
         <span>Sinn</span>
     </label>
 <label class="brand-card">
+        <input type="checkbox" value="Bell & Ross" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Bell &amp; Ross</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="Ressence" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>Ressence</span>
+    </label>
+<label class="brand-card">
+        <input type="checkbox" value="U-BOAT" onchange="selectBrand(this)" class="brand-checkbox sr-only">
+        <span>U-BOAT</span>
+    </label>
+
+<label class="brand-card">
         <input type="checkbox" value="Studio Underd0g" onchange="selectBrand(this)" class="brand-checkbox sr-only">
         <span>Studio Underd0g</span>
     </label>
@@ -852,7 +865,7 @@
           set: function(_value){ /* ignore legacy feature-level scope writes */ }
         });
       }
-      document.title = 'Watch Auth Pro v2.87.0 — Build 2870';
+      document.title = 'Watch Auth Pro v2.87.3 — Build 2873';
     </script>
     <script src="app.js?v=2841"></script>
     <script src="features/tag-calibre-11-reminder-v2651.js"></script>
@@ -863,7 +876,7 @@
     <script src="features/do-not-open-safety-v2873.js?v=2873"></script>
     <script>
 (function(){
-  var EXPECTED_BUILD='2870';
+  var EXPECTED_BUILD='2873';
   function stamp(){
     var el=document.getElementById('database-status');
     if(!el) return;
