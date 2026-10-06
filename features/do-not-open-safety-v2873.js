@@ -22,6 +22,14 @@
       action: 'DO NOT OPEN. External authentication only; escalate to Sinn or an approved specialist.'
     },
     {
+      brand: 'Sinn',
+      refs: ['1020.020'],
+      names: /(?:Ar[- ]?Dehumidifying|Ar[- ]?Trockenhaltetechnik|protective gas|drying capsule|\bU2(?:\s|$)|103\s+Ti\s+TESTAF|756\s+DIAPAL)/i,
+      medium: 'Protective-gas / dry-atmosphere system',
+      reason: 'Sinn Ar-Dehumidifying Technology uses a protective-gas filling with a drying capsule and EDR seals. Routine opening destroys the controlled dry atmosphere.',
+      action: 'DO NOT OPEN FOR ROUTINE AUTHENTICATION. External checks only unless the correct Sinn procedure is available to restore the protective atmosphere.'
+    },
+    {
       brand: 'Bell & Ross',
       names: /\b(?:Hydromax|Hydro\s*Challenger|Hydrochallenger|Hydro\s*8000M|Hydro\s*11[, ]?100M)\b/i,
       medium: 'Hydroil® liquid silicone',
