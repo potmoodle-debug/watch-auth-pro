@@ -54,7 +54,7 @@
   ];
 
   function clean(v) { return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); }
-  function norm(v) { return clean(v).toUpperCase().replace(/\s+/g,''); }
+  function norm(v) { return clean(v).toUpperCase().replace(/[^A-Z0-9]+/g,''); }
   function esc(v) {
     return clean(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
   }
@@ -89,15 +89,19 @@
   }
   function match() {
     var brand=selectedBrand(), ref=reference(), resolved=resolveRule(brand,ref), name=modelText(resolved);
-    if (!brand) return null;
+    var entered=clean(ref);
     for (var i=0;i<rules.length;i++) {
       var r=rules[i];
-      if (!brandMatches(r.brand,brand)) continue;
-      if (r.refs && r.refs.some(function(x){return norm(x)===norm(ref);})) return {rule:r,brand:brand,ref:ref,name:name};
-      if (r.ref && r.ref.test(clean(ref))) return {rule:r,brand:brand,ref:ref,name:name};
-      if (r.names && r.names.test(name)) return {rule:r,brand:brand,ref:ref,name:name};
-      /* Name fallback for model/family strings entered in the reference box. */
-      if (r.names && r.names.test(clean(ref))) return {rule:r,brand:brand,ref:ref,name:name};
+      var explicitBrand=brand && brand!=='Generic' && brand!=='Other';
+      var brandToken=norm(r.brand);
+      var entryToken=norm(entered);
+      var brandInEntry=entryToken.indexOf(brandToken)>=0;
+      if (explicitBrand && !brandMatches(r.brand,brand)) continue;
+      if (!explicitBrand && !brandInEntry && !(r.names && r.names.test(entered))) continue;
+      if (r.refs && r.refs.some(function(x){return norm(x)===norm(ref) || entryToken.indexOf(norm(x))>=0;})) return {rule:r,brand:r.brand,ref:ref,name:name};
+      if (r.ref && r.ref.test(clean(ref))) return {rule:r,brand:r.brand,ref:ref,name:name};
+      if (r.names && r.names.test(name)) return {rule:r,brand:r.brand,ref:ref,name:name};
+      if (r.names && r.names.test(entered)) return {rule:r,brand:r.brand,ref:ref,name:name};
     }
     return null;
   }
